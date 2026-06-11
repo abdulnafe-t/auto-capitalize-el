@@ -209,7 +209,6 @@ see `\\[auto-capitalize-mode]', `\\[turn-on-capitalize-mode]', or
 
 (defvar auto-capitalize--match-data nil)
 
-;; Maybe this regex has to be changed in XEmacs
 (defvar auto-capitalize-regex-lower "[[:lower:]]+")
 (defvar auto-capitalize-regex-verify
   "\\<\\([[:upper:]]?[[:lower:]]+\\.\\)+\\=")
@@ -286,39 +285,16 @@ This sets `auto-capitalize-state' to t."
 
 ;; Internal functions:
 
-(defun auto-capitalize-sentence-end()
-  "portability function. emacs 22.0.50 introduced sentence-end
-function, not available on other emacsen.
-Fix known to work on 23.0.90 and later"
-  (if (fboundp 'sentence-end)
-      (sentence-end)
-    sentence-end))
-
 (defun auto-capitalize-condition (beg end length)
   "Check condition."
   (condition-case error
       (or (and (or (eq this-command 'self-insert-command)
-                   ;; LaTeX mode binds "." to TeX-insert-punctuation,
-                   ;; and "\"" to TeX-insert-quote:
                    (let ((key (this-command-keys)))
-                     ;; XEmacs `lookup-key' signals "unable to bind
-                     ;; this type of event" for commands invoked via
-                     ;; the mouse:
-                     (and (not (and (vectorp key)
-                                    (> (length key) 0)
-                                    (fboundp 'misc-user-event-p)
-                                    (misc-user-event-p (aref key 0))))
-                          (eq (lookup-key global-map key t)
+                     (and (eq (lookup-key global-map key t)
                               'self-insert-command)
-                          ;; single character insertion?
                           (= length 0)
                           (= (- end beg) 1))))
-               (let ((self-insert-char
-                      (cond ((fboundp 'event-to-character) ; XEmacs
-                             (event-to-character last-command-event
-                                                 nil nil t))
-                            (t last-command-event)))) ; GNU Emacs
-                 (not (equal (char-syntax self-insert-char) ?w))))
+               (not (equal (char-syntax last-command-event) ?w)))
           (memq this-command '(newline newline-and-indent)))
     (error error)))
 
@@ -360,14 +336,11 @@ This should be installed as an `after-change-function'."
                      ;; recursion!
                      (let* ((this-command 'self-insert-command)
                             (non-word-char (char-after (match-beginning 0)))
-                            (last-command-event
-                             (cond ((fboundp 'character-to-event) ; XEmacs
-                                    (character-to-event non-word-char))
-                                   (t non-word-char)))) ; GNU Emacs
+                            (last-command-event non-word-char))
                        (set-match-data auto-capitalize--match-data)
                        (auto-capitalize-capitalize (match-beginning 0)
-                                        (match-end 0)
-                                        0))))))))
+                                                   (match-end 0)
+                                                   0))))))))
     (error error)))
 
 (defun auto-capitalize-user-specified (lowercase-word m-beg m-end)
@@ -403,7 +376,7 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
            (save-excursion
              (save-restriction
                (narrow-to-region (point-min) word-start)
-               (and (re-search-backward (auto-capitalize-sentence-end)
+                (and (re-search-backward (sentence-end)
                                         nil t)
                     (= (match-end 0) text-start)
                     ;; verify: preceded by whitespace?
