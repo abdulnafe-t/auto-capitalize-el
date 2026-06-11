@@ -1,6 +1,7 @@
 ;;; auto-capitalize.el --- Automatically capitalize (or upcase) words -*- lexical-binding: t; -*-
 
 ;; Copyright   1998,2001,2002,2005 Kevin Rodgers
+;; Copyright   2026 Abdulnafé Toulaïmat
 
 ;; This project was copied from emacswiki page
 ;; (https://www.emacswiki.org/emacs/auto-capitalize.el) and I changed
