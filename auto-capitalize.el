@@ -426,14 +426,13 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
                                      (not (eq (char-syntax (char-after)) ?w)))
                            (forward-char 1))
                          (point)))))))
-        ;; inserting lowercase text?
+       ;; inserting lowercase text?
        (let ((case-fold-search nil))
          (goto-char word-start)
          (looking-at auto-capitalize-regex-lower))
-       (and (eq auto-capitalize-state t)
-            (if (not auto-capitalize-ask)
-                t
-              (auto-capitalize--ask)))))
+       (and auto-capitalize-state
+            (or (not auto-capitalize-ask)
+                (auto-capitalize--ask)))))
 
 (defun auto-capitalize--ask ()
   (prog1 (y-or-n-p
