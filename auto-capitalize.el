@@ -233,8 +233,8 @@ The file name would be something like .aspell.en.pws."
   (rx (not (syntax word)) (or "e.g." "i.e." "vs.") (0+ " "))
   "Regex to avoid words.")
 
-(defconst auto-capitalize-version "$Revision: 2.20 $"
-  "This version of auto-capitalize.el.")
+(defconst auto-capitalize-version "3.0"
+  "The version of auto-capitalize.el.")
 
 (defvar-local auto-capitalize-state nil
   "If non-nil, the first word of a sentence is automatically capitalized.
