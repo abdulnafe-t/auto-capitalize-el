@@ -302,33 +302,14 @@ This will install `auto-capitalize-capitalize' in
 
 ;;;###autoload
 (define-globalized-minor-mode auto-capitalize-global-mode
-  auto-capitalize-mode turn-on-auto-capitalize-mode
+  auto-capitalize-mode auto-capitalize-mode
   :predicate '(not comint-mode))
 
-;;;###autoload
-(defun turn-on-auto-capitalize-mode ()
-  "Turn on `auto-capitalize' mode in this buffer.
-This sets `auto-capitalize' to t."
-  (interactive)
-  (auto-capitalize-mode 1))
 
 ;; Internal functions:
 
-;;;###autoload
-(defun turn-off-auto-capitalize-mode ()
-  "Turn off `auto-capitalize' mode in this buffer.
-This sets `auto-capitalize' to nil."
-  (interactive)
-  (auto-capitalize-mode -1))
 
-;;;###autoload
-(defun enable-auto-capitalize-mode ()
-  "Enable `auto-capitalize' mode in this buffer.
-This sets `auto-capitalize-state' to t."
-  (interactive)
-  (setq auto-capitalize-ask t))
 
-;; Internal functions:
 
 (defun auto-capitalize-condition (beg end length)
   "Check condition."
@@ -536,12 +517,6 @@ This should be installed as an `after-change-function', which
             (append auto-capitalize-exceptions
                     (auto-capitalize--get-aspell-capital-words f))))))
 
-;;;###autoload
-(defun auto-capitalize-setup ()
-  "Setup auto-capitalize."
-  (auto-capitalize-merge-aspell-words)
-  (add-hook 'after-change-major-mode-hook 'auto-capitalize-mode))
-
 ;; Org mode
 (with-eval-after-load "org"
   (defun auto-capitalize-predicate-org-mode ()
@@ -558,6 +533,39 @@ This should be installed as an `after-change-function', which
          (and (bound-and-true-p skk-mode)
               (fboundp 'skk-current-input-mode)
               (eq 'latin (skk-current-input-mode)))))))
+
+
+;; Deprecated functions:
+
+(defun turn-on-auto-capitalize-mode ()
+  "Turn on `auto-capitalize' mode in this buffer.
+This sets `auto-capitalize' to t."
+  (interactive)
+  (auto-capitalize-mode 1))
+
+(defun turn-off-auto-capitalize-mode ()
+  "Turn off `auto-capitalize' mode in this buffer.
+This sets `auto-capitalize' to nil."
+  (interactive)
+  (auto-capitalize-mode -1))
+
+(defun enable-auto-capitalize-mode ()
+  "Enable `auto-capitalize' mode in this buffer.
+This sets `auto-capitalize-state' to t."
+  (interactive)
+  (setq auto-capitalize-ask t))
+
+(defun auto-capitalize-setup ()
+  "Setup auto-capitalize."
+  (auto-capitalize-merge-aspell-words)
+  (add-hook 'after-change-major-mode-hook 'auto-capitalize-mode))
+
+(make-obsolete 'turn-on-auto-capitalize-mode  'auto-capitalize-mode "3.0")
+(make-obsolete 'turn-off-auto-capitalize-mode 'auto-capitalize-mode "3.0")
+(make-obsolete 'enable-auto-capitalize-mode   'auto-capitalize-mode "3.0")
+(make-obsolete 'auto-capitalize-setup         'auto-capitalize-global-mode "3.0")
+
+;; Old comments:
 
 ;; 1 Jun 2009: It does not work with Aquamacs 1.7/GNUEmacs 22. Only the first word in the buffer
 ;; (or the first word typed after mode activation) is capitalized.
