@@ -383,6 +383,7 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
   ""
   (goto-char text-start)
   (and (or (equal text-start (point-min)) ; (bobp)
+
            ;; beginning of paragraph?
            (and (= (current-column) left-margin)
                 (or (save-excursion
@@ -393,49 +394,50 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
                                                nil t)
                            (= (match-end 0) text-start)
                            (= (current-column) left-margin)))))
+
            ;; beginning of sentence?
            (save-excursion
              (save-restriction
                (narrow-to-region (point-min) word-start)
+               (and (re-search-backward (sentence-end)
+                                        nil t)
+                    (= (match-end 0) text-start)
+                    ;; verify: preceded by whitespace?
+                    (let ((previous-char (char-before text-start)))
+                      ;; In some modes, newline (^J, aka LFD) is comment-end,
+                      ;; not whitespace:
+                      (or (eq ?\n previous-char)
+                          (eq ?\  (char-syntax previous-char))))
+                    ;; verify: not preceded by an abbreviation?
+                    (let ((case-fold-search nil)
+                          (abbrev-regexp auto-capitalize-regex-verify))
+                      (goto-char
+                       (1+ (match-beginning 0)))
+                      (or (not
+                           (re-search-backward abbrev-regexp nil t))
+                          (not
+                           (member (match-string 0) auto-capitalize-words)))))))
 
-               (or
-                (save-excursion
-                  (progn
-                    (goto-char word-start)
-                    (when-let* ((string-start
-                                 (nth 8 (syntax-ppss))))
-                      (goto-char string-start)
-                      (eq (1+ (point)) word-start)))) ; Beginning of a string
+           ;; beginning of a string?
+           (progn
+             (goto-char word-start)
+             (when-let* ((string-start
+                          (nth 8 (syntax-ppss))))
+               (eq (1+ string-start) word-start)))
 
-                (save-excursion
-                  (re-search-backward comment-start-skip)
-                  (= (match-end 0) word-start)) ; Beginning of a comment
+           ;; beginning of a comment?
+           (and
+            (re-search-backward comment-start-skip)
+            (= (match-end 0) word-start)))
 
-                (and (re-search-backward (sentence-end)
-                                         nil t)
-                     (= (match-end 0) text-start)
-                     ;; verify: preceded by whitespace?
-                     (let ((previous-char (char-before text-start)))
-                       ;; In some modes, newline (^J, aka LFD) is comment-end,
-                       ;; not whitespace:
-                       (or (eq ?\n previous-char)
-                           (eq ?\  (char-syntax previous-char))))
-                     ;; verify: not preceded by an abbreviation?
-                     (let ((case-fold-search nil)
-                           (abbrev-regexp auto-capitalize-regex-verify))
-                       (goto-char
-                        (1+ (match-beginning 0)))
-                       (or (not
-                            (re-search-backward abbrev-regexp nil t))
-                           (not
-                            (member (match-string 0) auto-capitalize-words)))))))))
        ;; inserting lowercase text?
        (let ((case-fold-search nil))
          (goto-char word-start)
          (looking-at auto-capitalize-regex-lower))
-       (and auto-capitalize-state
-            (or (not auto-capitalize-ask)
-                (auto-capitalize--ask)))))
+       (and (eq auto-capitalize-state t)
+            (if (not auto-capitalize-ask)
+                t
+              (auto-capitalize--ask)))))
 
 (defun auto-capitalize--ask ()
   (prog1 (y-or-n-p
