@@ -397,35 +397,38 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
            (save-excursion
              (save-restriction
                (narrow-to-region (point-min) word-start)
+
+               (or
+                (save-excursion
+                  (progn
+                    (goto-char word-start)
+                    (when-let* ((string-start
+                                 (nth 8 (syntax-ppss))))
+                      (goto-char string-start)
+                      (eq (1+ (point)) word-start)))) ; Beginning of a string
+
+                (save-excursion
+                  (re-search-backward comment-start-skip)
+                  (= (match-end 0) word-start)) ; Beginning of a comment
+
                 (and (re-search-backward (sentence-end)
-                                        nil t)
-                    (= (match-end 0) text-start)
-                    ;; verify: preceded by whitespace?
-                    (let ((previous-char (char-before text-start)))
-                      ;; In some modes, newline (^J, aka LFD) is comment-end,
-                      ;; not whitespace:
-                      (or (eq ?\n previous-char)
-                          (eq ?\  (char-syntax previous-char))))
-                    ;; verify: not preceded by an abbreviation?
-                    (let ((case-fold-search nil)
-                          (abbrev-regexp auto-capitalize-regex-verify))
-                      (goto-char
-                       (1+ (match-beginning 0)))
-                      (or (not
-                           (re-search-backward abbrev-regexp nil t))
+                                         nil t)
+                     (= (match-end 0) text-start)
+                     ;; verify: preceded by whitespace?
+                     (let ((previous-char (char-before text-start)))
+                       ;; In some modes, newline (^J, aka LFD) is comment-end,
+                       ;; not whitespace:
+                       (or (eq ?\n previous-char)
+                           (eq ?\  (char-syntax previous-char))))
+                     ;; verify: not preceded by an abbreviation?
+                     (let ((case-fold-search nil)
+                           (abbrev-regexp auto-capitalize-regex-verify))
+                       (goto-char
+                        (1+ (match-beginning 0)))
+                       (or (not
+                            (re-search-backward abbrev-regexp nil t))
                            (not
-                            (member (match-string 0) auto-capitalize-words)))))))
-           ;; beginning of comment or string?
-           (save-excursion
-             (let ((ppss (syntax-ppss text-start)))
-               (and (nth 8 ppss)
-                    (= text-start
-                       (save-excursion
-                         (goto-char (nth 8 ppss))
-                         (while (and (not (eobp))
-                                     (not (eq (char-syntax (char-after)) ?w)))
-                           (forward-char 1))
-                         (point)))))))
+                            (member (match-string 0) auto-capitalize-words)))))))))
        ;; inserting lowercase text?
        (let ((case-fold-search nil))
          (goto-char word-start)
