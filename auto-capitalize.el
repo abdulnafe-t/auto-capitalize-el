@@ -419,16 +419,18 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
                            (member (match-string 0) auto-capitalize-words)))))))
 
            ;; beginning of a string?
-           (progn
-             (goto-char word-start)
-             (when-let* ((string-start
-                          (nth 8 (syntax-ppss))))
-               (eq (1+ string-start) word-start)))
+           (and (derived-mode-p 'prog-mode)
+                (or
+                 (progn
+                   (goto-char word-start)
+                   (when-let* ((string-start
+                                (nth 8 (syntax-ppss))))
+                     (eq (1+ string-start) word-start)))
 
-           ;; beginning of a comment?
-           (and
-            (re-search-backward comment-start-skip nil t)
-            (= (match-end 0) word-start)))
+                 ;; beginning of a comment?
+                 (and
+                  (re-search-backward comment-start-skip nil t)
+                  (= (match-end 0) word-start)))))
 
        ;; inserting lowercase text?
        (let ((case-fold-search nil))
