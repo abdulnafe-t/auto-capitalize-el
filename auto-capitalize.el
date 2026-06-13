@@ -15,11 +15,10 @@
 ;; Package-Requires: ((emacs "24.3") (cl-lib "0.5"))
 
 ;; Created: 20 May 1998
-;; Version: $Revision: 2.20 $
-;; Package-Version: 2.20
+;; Version: 3.0
+;; Package-Version: 3.0
 ;; Keywords: text, wp, convenience
-;; RCS $Id: auto-capitalize.el,v 2.20 2005/05/25 18:47:22 kevinr Exp $
-;; URL: https://github.com/yuutayamada/auto-capitalize-el
+;; URL: https://github.com/abdulnafe-t/auto-capitalize-el
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -122,7 +121,6 @@
 ;; welcome)
 ;;
 ;;; Code:
-
 
 ;; TODO: is this still true?
 ;; Rationale:
