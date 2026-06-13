@@ -366,8 +366,7 @@ This should be installed as an `after-change-function'."
     (error error)))
 
 (defun auto-capitalize-user-specified (m-beg m-end)
-  "Find LOWERCASE-WORD and capitalize it.
-The M-BEG and M-END are used to substring LOWERCASE-WORD."
+  "Find the word between M-BEG and M-END and capitalize it."
   (let ((lowercase-word (buffer-substring m-beg m-end)))
     (unless (member lowercase-word auto-capitalize-words)
       ;; not preserving lower case
