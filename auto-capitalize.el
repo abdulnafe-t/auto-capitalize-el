@@ -729,8 +729,9 @@ If called interactively, prompts for a single string to add."
 (defun auto-capitalize-remove-abbrevs (abbrevs &optional buffer-local)
   "Remove one or more abbreviations from `auto-capitalize-abbrevs'.
 
-ABBREVS is either a string or a list of strings to be removed.
-If BUFFER-LOCAL is non-nil, the change applies buffer-locally only.
+ABBREVS is either a string or a list of strings to be removed. If
+BUFFER-LOCAL is non-nil (such as with a prefix arg), the change applies
+buffer-locally only.
 
 Interactively, uses completion to select an existing abbreviation."
   (interactive
@@ -756,8 +757,9 @@ Interactively, uses completion to select an existing abbreviation."
 (defun auto-capitalize-remove-fixed-case-words (words &optional buffer-local)
   "Remove one or more words from `auto-capitalize-fixed-case-words'.
 
-WORDS is either a string or a list of strings to be removed.
-If BUFFER-LOCAL is non-nil, the change applies buffer-locally only.
+WORDS is either a string or a list of strings to be removed. If
+BUFFER-LOCAL is non-nil (such as with a prefix arg), the change applies
+buffer-locally only.
 
 Interactively, uses completion to select an existing word."
   (interactive
