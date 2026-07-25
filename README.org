@@ -137,7 +137,7 @@ blocking and trigger functions when their respective modes are enabled.
 
 * How it works
 
-The package’s main entry point is the function ~auto-capitalize-capitalize~. The minor-mode
+The package’s main entry point is the function ~auto-capitalize-after-change~. The minor-mode
 adds it to ~after-change-functions~, so it gets called as you type, delete, yank, etc. Its
 job is to run the first layer of logic: it calls all functions in
 ~auto-capitalize-blocking-functions~, and if they all return nil, either calls

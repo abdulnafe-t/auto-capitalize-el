@@ -37,7 +37,7 @@
 ;; comments or strings in any `prog-mode' buffer, or indeed any buffer where
 ;; comments are defined by the major mode (Org, TeX,...).
 ;;
-;; The heart of the package is `auto-capitalize-capitalize', which is installed
+;; The heart of the package is `auto-capitalize-after-change', which is installed
 ;; in `after-change-functions' when the mode is enabled. It serves as the main
 ;; entry point for the capitalization logic, which is based on two hooks that
 ;; you can add your own predicates to. The `auto-capitalize-blocking-functions'
@@ -91,7 +91,7 @@
 ;; Internal variables:
 
 (defvar auto-capitalize--match-data nil
-  "Holds match data across recursive calls in `auto-capitalize-capitalize'.")
+  "Holds match data across recursive calls in `auto-capitalize-after-change'.")
 
 (defvar auto-capitalize--fixed-case-regexp nil
   "Cached regexp built from `auto-capitalize-fixed-case-words'.
@@ -211,7 +211,7 @@ char at ABBREV-START is uppercase, downcase the whole abbreviation."
            (undo-boundary)
            (downcase-region abbrev-start abbrev-end)))))
 
-(defun auto-capitalize-capitalize (beg end length)
+(defun auto-capitalize-after-change (beg end length)
   "If `auto-capitalize-mode' is enabled, then start the capitalization logic.
 
 This function is installed as an `after-change-function' by
@@ -265,7 +265,7 @@ word before point (or the yanked text) should be capitalized."
                          (non-word-char (char-after (match-beginning 0)))
                          (last-command-event non-word-char))
                     (set-match-data auto-capitalize--match-data)
-                    (auto-capitalize-capitalize (match-beginning 0)
+                    (auto-capitalize-after-change (match-beginning 0)
                                                 (match-end 0)
                                                 0))))))
 
@@ -714,7 +714,7 @@ their own trigger functions to this hook buffer-locally."
 (define-minor-mode auto-capitalize-mode
   "Toggle `auto-capitalize' minor mode in the current buffer.
 
-This will install `auto-capitalize-capitalize' in
+This will install `auto-capitalize-after-change' in
 `after-change-functions' in the current buffer."
 
   :init-value nil
@@ -723,11 +723,11 @@ This will install `auto-capitalize-capitalize' in
   (cond
    ;; Turn off
    ((not auto-capitalize-mode)
-    (remove-hook 'after-change-functions 'auto-capitalize-capitalize t))
+    (remove-hook 'after-change-functions 'auto-capitalize-after-change t))
 
    ;; Turn on
    (t
-    (add-hook 'after-change-functions #'auto-capitalize-capitalize nil t))))
+    (add-hook 'after-change-functions #'auto-capitalize-after-change nil t))))
 
 ;;;###autoload
 (define-globalized-minor-mode auto-capitalize-global-mode
