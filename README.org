@@ -141,17 +141,17 @@ The package’s main entry point is the function ~auto-capitalize-after-change~.
 adds it to ~after-change-functions~, so it gets called as you type, delete, yank, etc. Its
 job is to run the first layer of logic: it calls all functions in
 ~auto-capitalize-blocking-functions~, and if they all return nil, either calls
-~auto-capitalize-maybe-capitalize~ if you are simply typing, or recursively analyzes
+~auto-capitalize--maybe-capitalize~ if you are simply typing, or recursively analyzes
 the text if you are yanking (and ~auto-capitalize-yank~ is non-nil).
 
-~auto-capitalize-maybe-capitalize~ and ~auto-capitalize-handle-fixed-case~ are the
+~auto-capitalize--maybe-capitalize~ and ~auto-capitalize-handle-fixed-case~ are the
 functions actually responsible for capitalizing words. The former checks if the word at
 ~word-start~ matches ~auto-capitalize--fixed-case-regexp~, which is built from
 ~auto-capitalize-fixed-case-words~. If it does, it calls ~auto-capitalize-handle-fixed-case~,
 which simply replaces the word with its corresponding entry in
 ~auto-capitalize-fixed-case-words~.
 
-Otherwise, ~auto-capitalize-maybe-capitalize~ calls ~auto-capitalize-trigger-functions~.
+Otherwise, ~auto-capitalize--maybe-capitalize~ calls ~auto-capitalize-trigger-functions~.
 Those functions then check to see if capitalization is appropriate in the current context,
 i.e. that the word is at the beginning of a sentence or a paragraph in text-mode, or a
 comment (if ~auto-capitalize-comments~ is non-nil), etc.

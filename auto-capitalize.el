@@ -95,7 +95,7 @@
 
 (defvar auto-capitalize--fixed-case-regexp nil
   "Cached regexp built from `auto-capitalize-fixed-case-words'.
-Used by `auto-capitalize-maybe-capitalize' to avoid
+Used by `auto-capitalize--maybe-capitalize' to avoid
 rebuilding the regexp on every keystroke.")
 
 (defvar auto-capitalize--abbrevs-regexp nil
@@ -273,7 +273,7 @@ word before point (or the yanked text) should be capitalized."
             ;; Self-inserting, non-word character.
             (and (> beg (point-min))
                  (eq (char-syntax (char-before beg)) ?w)
-                 (auto-capitalize-maybe-capitalize
+                 (auto-capitalize--maybe-capitalize
                   text-start word-start))))))
     (error (message "auto-capitalize error: %S" error) nil)))
 
@@ -457,7 +457,7 @@ If called interactively, prompts for a single string to add."
                   (buffer-substring (match-beginning 0) (match-end 0))))
     (message "")))
 
-(defun auto-capitalize-maybe-capitalize (text-start word-start)
+(defun auto-capitalize--maybe-capitalize (text-start word-start)
   "Capitalize the word at WORD-START if either of the following conditions hold:
 
 1) it appears capitalized in `auto-capitalize-fixed-case-words'
