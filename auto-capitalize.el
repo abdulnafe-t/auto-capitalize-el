@@ -707,7 +707,8 @@ If called interactively, prompts for a single string to add."
   (setq abbrevs (ensure-list abbrevs))
   (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
                                 (nconc auto-capitalize-abbrevs abbrevs)
-                                buffer-local))
+                                buffer-local)
+  (message "%s" auto-capitalize-abbrevs))
 
 (defun auto-capitalize-add-fixed-case-words (words &optional buffer-local)
   "Add one or more fixed-case words to `auto-capitalize-fixed-case-words'.
@@ -722,7 +723,8 @@ If called interactively, prompts for a single string to add."
   (setq words (ensure-list words))
   (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
                                    (nconc auto-capitalize-fixed-case-words words)
-                                   buffer-local))
+                                   buffer-local)
+  (message "%s" auto-capitalize-fixed-case-words))
 
 (defun auto-capitalize-remove-abbrevs (abbrevs &optional buffer-local)
   "Remove one or more abbreviations from `auto-capitalize-abbrevs'.
@@ -748,7 +750,8 @@ Interactively, uses completion to select an existing abbreviation."
           (delete abbrev auto-capitalize-abbrevs)))
   (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
                                 auto-capitalize-abbrevs
-                                buffer-local))
+                                buffer-local)
+  (message "%s" auto-capitalize-abbrevs))
 
 (defun auto-capitalize-remove-fixed-case-words (words &optional buffer-local)
   "Remove one or more words from `auto-capitalize-fixed-case-words'.
@@ -774,7 +777,9 @@ Interactively, uses completion to select an existing word."
           (delete word auto-capitalize-fixed-case-words)))
   (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
                                    auto-capitalize-fixed-case-words
-                                   buffer-local))
+                                   buffer-local)
+  (message "%s" auto-capitalize-fixed-case-words))
+
 
 ;;;###autoload
 (define-minor-mode auto-capitalize-mode
