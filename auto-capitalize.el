@@ -372,7 +372,7 @@ which see."
   :type 'boolean)
 
 (defcustom auto-capitalize-fixed-case-words '("I")
-  "If non-nil, a list of words that will always be in the case they appear in here.
+  "If non-nil, words that will always be in the case they appear in here.
 
 If `auto-capitalize' mode is on, and as long as
 `auto-capitalize-blocking-functions' pass, these words will be
@@ -383,8 +383,9 @@ ensured by the function `auto-capitalize--handle-fixed-case', which see.
 
 This list should be set with `setopt', the `customize' interface, the
 `:custom' keyword in `use-package', or modified with
-`auto-capitalize-add-fixed-case-words'/`auto-capitalize-remove-fixed-case-words'.
-Changing it with `setq' or `add-to-list' will not work correctly."
+`auto-capitalize-add-fixed-case-words' or
+`auto-capitalize-remove-fixed-case-words'. Changing it with `setq' or
+`add-to-list' will not work correctly."
 
   :group 'auto-capitalize
   :type '(repeat (string :tag "Word list"))
@@ -401,8 +402,8 @@ which see.
 
 This list should be set with `setopt', the :custom keyword in
 `use-package', the `customize' interface, or modified with
-`auto-capitalize-add-abbrevs'/`auto-capitalize-remove-abbrevs'. Changing
-it with `setq' or `add-to-list' will not work correctly."
+`auto-capitalize-add-abbrevs' or `auto-capitalize-remove-abbrevs'.
+Changing it with `setq' or `add-to-list' will not work correctly."
 
   :group 'auto-capitalize
   :type '(repeat (string :tag "Non-sentence ending word."))
