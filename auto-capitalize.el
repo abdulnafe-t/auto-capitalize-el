@@ -125,68 +125,7 @@ the regexp on every keystroke, and by
 (defvar auto-capitalize-downcase-ie)
 
 
-;; Internal functions:
-
-(defun auto-capitalize-default-blocking-function (_text-start word-start)
-  "Block auto-capitalization if the current context demands it.
-
-TEXT-START and WORD-START are the positions of the start of the current
-text and the start of the current word, respectively.
-
-Specifically, check the current buffer for the following conditions, and
-return non-nil to block capitalization if any of them hold:
-
-1) It is read-only
-
-2) it is a minibuffer
-
-3) if in `prog-mode', the current text is in neither a comment nor a
-string, or it is but the corresponding user
-option (`auto-capitalize-comments' or `auto-capitalize-strings') is nil.
-Outside of `prog-mode', text outside of comments or strings is not
-blocked, while capitalization in comments/strings is similarly gated by
-the corresponding user options.
-
-4) if the previous word is in `auto-capitalize-abbrevs'
-
-5) the last typed character was not one of
-`auto-capitalize-trigger-chars'."
-
-  (or buffer-read-only
-      (minibufferp)
-
-      ;; If in prog-mode, don't block inside comments or strings if the
-      ;; corresponding option is non-nil
-      ;;
-      ;; If not in prog-mode, don't block if outside of comments or strings,
-      ;; and only block inside comments or strings if the corresponding option
-      ;; is nil.
-      (save-excursion
-        (goto-char word-start)
-        (or
-         (if (derived-mode-p 'prog-mode)
-             (and
-              (or (not auto-capitalize-strings) (not (nth 3 (syntax-ppss))))
-              (or (not auto-capitalize-comments) (not (nth 4 (syntax-ppss)))))
-           (or
-            (and (nth 3 (syntax-ppss)) (not auto-capitalize-strings))
-            (and (nth 4 (syntax-ppss)) (not auto-capitalize-comments))))
-
-         ;; Block capitalization after any word in `auto-capitalize-abbrevs',
-         ;; unless the current word is one in `auto-capitalize-fixed-case-words'
-
-         (and (not (looking-at auto-capitalize--fixed-case-regexp))
-              (re-search-backward
-               auto-capitalize--abbrevs-regexp
-               (line-beginning-position) t)
-              (= (1+ (match-end 0)) word-start))))
-
-      ;; Only capitalize after typing or yanking text, but only after
-      ;; `auto-capitalize-trigger-chars'
-      (and auto-capitalize-trigger-chars
-           (memq this-command `(self-insert-command
-                                ,(command-remapping 'self-insert-command)))
-           (not (memq last-command-event auto-capitalize-trigger-chars)))))
+;; Internal functions
 
 (defun auto-capitalize--inserted-trigger-char (beg end length)
   "Return non-nil if the inserted text ends with a trigger character.
@@ -210,72 +149,6 @@ char at ABBREV-START is uppercase, downcase the whole abbreviation."
          (when (eq abbrev-first-char (upcase abbrev-first-char))
            (undo-boundary)
            (downcase-region abbrev-start abbrev-end)))))
-
-(defun auto-capitalize-after-change (beg end length)
-  "If `auto-capitalize-mode' is enabled, then start the capitalization logic.
-
-This function is installed as an `after-change-function' by
-`auto-capitalize-mode'. As such its three arguments are:
-
-BEG, END: buffer positions where the changed text starts and ends,
-respectively.
-
-LENGTH: the length (in chars) of the pre-change text replaced by that
-range. In practice, this is almost always zero, except when yanking text
-and `auto-capitalize-yank' is non-nil.
-
-This function serves as a dispatcher of other functions to decide if the
-word before point (or the yanked text) should be capitalized."
-
-  (condition-case error
-      (let* ((word-start
-              (save-excursion
-                (forward-word -1)
-                (point)))
-             (text-start
-              (save-excursion
-                (goto-char word-start)
-                (cl-loop while (or (minusp (skip-chars-backward "\""))
-                                   (minusp (skip-syntax-backward "\"("))))
-                (point))))
-        (when (or (null auto-capitalize-blocking-functions)
-                  (not (run-hook-with-args-until-success
-                        'auto-capitalize-blocking-functions text-start word-start)))
-
-          (cond
-           ;; We need to check for yanking before checking for trigger chars,
-           ;; because if the yanked text ends in a trigger char, only that
-           ;; trigger char gets processed, meaning the rest of the text does
-           ;; not get capitalized correctly. Checking for yanking first solves
-           ;; this issue.
-           ((and auto-capitalize-yank
-                 ;; `yank' sets `this-command' to t, and the
-                 ;; after-change-functions are run before it has been
-                 ;; reset:
-                 (or (eq this-command 'yank)
-                     (and (= length 0) ; insertion?
-                          (eq this-command 't))))
-            (save-excursion
-              (goto-char beg)
-              (save-match-data
-                (while (re-search-forward "\\Sw" end t)
-                  (setq auto-capitalize--match-data (match-data))
-                  ;; recursion!
-                  (let* ((this-command 'self-insert-command)
-                         (non-word-char (char-after (match-beginning 0)))
-                         (last-command-event non-word-char))
-                    (set-match-data auto-capitalize--match-data)
-                    (auto-capitalize-after-change (match-beginning 0)
-                                                (match-end 0)
-                                                0))))))
-
-           ((auto-capitalize--inserted-trigger-char beg end length)
-            ;; Self-inserting, non-word character.
-            (and (> beg (point-min))
-                 (eq (char-syntax (char-before beg)) ?w)
-                 (auto-capitalize--maybe-capitalize
-                  text-start word-start))))))
-    (error (message "auto-capitalize error: %S" error) nil)))
 
 (defun auto-capitalize--handle-fixed-case (beg end)
   "Find the word between BEG and END and replace it with its fixed-case entry.
@@ -325,182 +198,6 @@ only capitalize if the user answered \"y\"."
 
    (run-hook-with-args-until-success
     'auto-capitalize-trigger-functions text-start word-start)))
-
-(defun auto-capitalize-default-trigger-function (text-start word-start)
-  "Check the context around TEXT-START/WORD-START.
-
-This predicate returns non-nil if any of the following conditions hold:
-
-1) in `text-mode', TEXT-START is at the beginning of the buffer
-
-2) WORD-START is the first word in a heading, as defined by the
-buffer-local value of `outline-regexp', and
-`auto-capitalize-outline-headings' is non-nil
-
-3) WORD-START is the first word of a paragraph, as identified by either
-`start-of-paragraph-text', or a simple newline preceding the word
-
-4) WORD-START is the first char of a sentence, identified through the
-function `bounds-of-thing-at-point'. If that function returns nil, check
-to see if the preceding text matches the return value of function
-`sentence-end'
-
-5) WORD-START is the first word of a comment, as determined by
-`syntax-ppss', and `auto-capitalize-comments' (and
-`auto-capitalize-start-of-inline-comments', if the comment is inline) is
-non-nil.
-
-6) WORD-START is the first word of a string, as determined by
-`syntax-ppss', and `auto-capitalize-strings' (and
-`auto-capitalize-start-of-inline-strings', if the string is inline) are
-non-nil."
-
-  (save-excursion
-    (goto-char text-start)
-    (or
-
-     (and (derived-mode-p 'text-mode)
-          (or (bobp)
-              (and auto-capitalize-outline-headings
-                   (bound-and-true-p outline-regexp)
-                   (save-excursion
-                     (goto-char (line-beginning-position))
-                     (when (looking-at outline-regexp)
-                       (goto-char (match-end 0))
-                       (skip-syntax-forward "^w" (line-end-position))
-                       (= word-start (point)))))))
-
-     ;; Beginning of paragraph?
-     (or (= word-start
-            (save-excursion
-              (start-of-paragraph-text)
-              (skip-syntax-forward "^w")
-              (point)))
-         (save-excursion
-           (goto-char word-start)
-           (skip-syntax-backward "\s")
-           (backward-char)
-           (looking-at "\n")))
-
-     ;; Beginning of a sentence?
-     (if-let* ((bounds (car (bounds-of-thing-at-point 'sentence))))
-         (= word-start
-            (save-excursion
-              (goto-char bounds)
-              (skip-syntax-forward "^w")
-              (point)))
-       (save-excursion
-         (skip-syntax-backward "^w" (line-beginning-position))
-         (looking-at (sentence-end))))
-
-     ;; Beginning of a comment?
-     (and auto-capitalize-comments
-          auto-capitalize-start-of-inline-comments
-          (save-excursion
-            (when-let* ((comment-start (nth 8 (syntax-ppss))))
-              (= word-start
-                 (save-excursion
-                   (goto-char comment-start)
-                   (skip-syntax-forward "^w")
-                   (point))))))
-
-     ;; Beginning of a string?
-     (and auto-capitalize-strings
-          (save-excursion
-            (goto-char word-start)
-            (when-let* ((string-start (nth 8 (syntax-ppss))))
-              (and (or auto-capitalize-start-of-inline-strings
-                       (progn (goto-char string-start)
-                              (skip-chars-backward "\"'")
-                              (skip-chars-backward " \t")
-                              (bolp)))
-                   (= word-start
-                      (save-excursion
-                        (goto-char string-start)
-                        (skip-syntax-forward "^w")
-                        (point))))))))))
-
-(defun auto-capitalize-add-abbrevs (abbrevs &optional buffer-local)
-  "Add one or more abbreviations to `auto-capitalize-abbrevs'.
-
-ABBREVS is either a string or a list of strings to be added to
-`auto-capitalize-abbrevs'. If BUFFER-LOCAL is non-nil, the new abbrevs
-are added buffer-locally only.
-
-If called interactively, prompts for a single string to add."
-
-  (interactive "sAbbreviation to add: ")
-  (setq abbrevs (ensure-list abbrevs))
-  (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
-                                (nconc auto-capitalize-abbrevs abbrevs)
-                                buffer-local))
-
-(defun auto-capitalize-add-fixed-case-words (words &optional buffer-local)
-  "Add one or more fixed-case words to `auto-capitalize-fixed-case-words'.
-
-WORDS is either a string or a list of strings to be added to
-`auto-capitalize-fixed-case-words'. If BUFFER-LOCAL is non-nil, the new
-words are added buffer-locally only.
-
-If called interactively, prompts for a single string to add."
-
-  (interactive "sFixed case word to add: ")
-  (setq words (ensure-list words))
-  (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
-                                   (nconc auto-capitalize-fixed-case-words words)
-                                   buffer-local))
-
-(defun auto-capitalize-remove-abbrevs (abbrevs &optional buffer-local)
-  "Remove one or more abbreviations from `auto-capitalize-abbrevs'.
-
-ABBREVS is either a string or a list of strings to be removed.
-If BUFFER-LOCAL is non-nil, the change applies buffer-locally only.
-
-Interactively, uses completion to select an existing abbreviation."
-  (interactive
-   (list (completing-read
-          "Abbreviation to remove: "
-          (lambda (string pred action)
-            (if (eq action 'metadata)
-                '(metadata (category . auto-capitalize-abbrev))
-              (complete-with-action action
-                                    auto-capitalize-abbrevs string pred)))
-          nil t)
-         current-prefix-arg))
-  (dolist (abbrev (ensure-list abbrevs))
-    (unless (member abbrev auto-capitalize-abbrevs)
-      (error "%s is not in auto-capitalize-abbrevs" abbrev))
-    (setq auto-capitalize-abbrevs
-          (delete abbrev auto-capitalize-abbrevs)))
-  (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
-                                auto-capitalize-abbrevs
-                                buffer-local))
-
-(defun auto-capitalize-remove-fixed-case-words (words &optional buffer-local)
-  "Remove one or more words from `auto-capitalize-fixed-case-words'.
-
-WORDS is either a string or a list of strings to be removed.
-If BUFFER-LOCAL is non-nil, the change applies buffer-locally only.
-
-Interactively, uses completion to select an existing word."
-  (interactive
-   (list (completing-read
-          "Fixed-case word to remove: "
-          (lambda (string pred action)
-            (if (eq action 'metadata)
-                '(metadata (category . auto-capitalize-fixed-case))
-              (complete-with-action action
-                                    auto-capitalize-fixed-case-words string pred)))
-          nil t nil nil nil t)
-         current-prefix-arg))
-  (dolist (word (ensure-list words))
-    (unless (member word auto-capitalize-fixed-case-words)
-      (error "%s is not in auto-capitalize-fixed-case-words" word))
-    (setq auto-capitalize-fixed-case-words
-          (delete word auto-capitalize-fixed-case-words)))
-  (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
-                                   auto-capitalize-fixed-case-words
-                                   buffer-local))
 
 (defun auto-capitalize--ask ()
   "Ask the user whether the last typed word should be capitalized or not."
@@ -606,7 +303,7 @@ If BUFFER-LOCAL is non-nil, only set the buffer-local value."
             nil))))
 
 
-;; User options:
+;; User options
 
 (defcustom auto-capitalize-ask nil
   "If non-nil, always ask before capitalizing."
@@ -761,7 +458,314 @@ their own trigger functions to this hook buffer-locally."
   :options (list #'auto-capitalize-default-trigger-function))
 
 
-;; Commands:
+;; User-facing functions
+
+(defun auto-capitalize-default-blocking-function (_text-start word-start)
+  "Block auto-capitalization if the current context demands it.
+
+TEXT-START and WORD-START are the positions of the start of the current
+text and the start of the current word, respectively.
+
+Specifically, check the current buffer for the following conditions, and
+return non-nil to block capitalization if any of them hold:
+
+1) It is read-only
+
+2) it is a minibuffer
+
+3) if in `prog-mode', the current text is in neither a comment nor a
+string, or it is but the corresponding user
+option (`auto-capitalize-comments' or `auto-capitalize-strings') is nil.
+Outside of `prog-mode', text outside of comments or strings is not
+blocked, while capitalization in comments/strings is similarly gated by
+the corresponding user options.
+
+4) if the previous word is in `auto-capitalize-abbrevs'
+
+5) the last typed character was not one of
+`auto-capitalize-trigger-chars'."
+
+  (or buffer-read-only
+      (minibufferp)
+
+      ;; If in prog-mode, don't block inside comments or strings if the
+      ;; corresponding option is non-nil
+      ;;
+      ;; If not in prog-mode, don't block if outside of comments or strings,
+      ;; and only block inside comments or strings if the corresponding option
+      ;; is nil.
+      (save-excursion
+        (goto-char word-start)
+        (or
+         (if (derived-mode-p 'prog-mode)
+             (and
+              (or (not auto-capitalize-strings) (not (nth 3 (syntax-ppss))))
+              (or (not auto-capitalize-comments) (not (nth 4 (syntax-ppss)))))
+           (or
+            (and (nth 3 (syntax-ppss)) (not auto-capitalize-strings))
+            (and (nth 4 (syntax-ppss)) (not auto-capitalize-comments))))
+
+         ;; Block capitalization after any word in `auto-capitalize-abbrevs',
+         ;; unless the current word is one in `auto-capitalize-fixed-case-words'
+
+         (and (not (looking-at auto-capitalize--fixed-case-regexp))
+              (re-search-backward
+               auto-capitalize--abbrevs-regexp
+               (line-beginning-position) t)
+              (= (1+ (match-end 0)) word-start))))
+
+      ;; Only capitalize after typing or yanking text, but only after
+      ;; `auto-capitalize-trigger-chars'
+      (and auto-capitalize-trigger-chars
+           (memq this-command `(self-insert-command
+                                ,(command-remapping 'self-insert-command)))
+           (not (memq last-command-event auto-capitalize-trigger-chars)))))
+
+
+(defun auto-capitalize-default-trigger-function (text-start word-start)
+  "Check the context around TEXT-START/WORD-START.
+
+This predicate returns non-nil if any of the following conditions hold:
+
+1) in `text-mode', TEXT-START is at the beginning of the buffer
+
+2) WORD-START is the first word in a heading, as defined by the
+buffer-local value of `outline-regexp', and
+`auto-capitalize-outline-headings' is non-nil
+
+3) WORD-START is the first word of a paragraph, as identified by either
+`start-of-paragraph-text', or a simple newline preceding the word
+
+4) WORD-START is the first char of a sentence, identified through the
+function `bounds-of-thing-at-point'. If that function returns nil, check
+to see if the preceding text matches the return value of function
+`sentence-end'
+
+5) WORD-START is the first word of a comment, as determined by
+`syntax-ppss', and `auto-capitalize-comments' (and
+`auto-capitalize-start-of-inline-comments', if the comment is inline) is
+non-nil.
+
+6) WORD-START is the first word of a string, as determined by
+`syntax-ppss', and `auto-capitalize-strings' (and
+`auto-capitalize-start-of-inline-strings', if the string is inline) are
+non-nil."
+
+  (save-excursion
+    (goto-char text-start)
+    (or
+
+     (and (derived-mode-p 'text-mode)
+          (or (bobp)
+              (and auto-capitalize-outline-headings
+                   (bound-and-true-p outline-regexp)
+                   (save-excursion
+                     (goto-char (line-beginning-position))
+                     (when (looking-at outline-regexp)
+                       (goto-char (match-end 0))
+                       (skip-syntax-forward "^w" (line-end-position))
+                       (= word-start (point)))))))
+
+     ;; Beginning of paragraph?
+     (or (= word-start
+            (save-excursion
+              (start-of-paragraph-text)
+              (skip-syntax-forward "^w")
+              (point)))
+         (save-excursion
+           (goto-char word-start)
+           (skip-syntax-backward "\s")
+           (backward-char)
+           (looking-at "\n")))
+
+     ;; Beginning of a sentence?
+     (if-let* ((bounds (car (bounds-of-thing-at-point 'sentence))))
+         (= word-start
+            (save-excursion
+              (goto-char bounds)
+              (skip-syntax-forward "^w")
+              (point)))
+       (save-excursion
+         (skip-syntax-backward "^w" (line-beginning-position))
+         (looking-at (sentence-end))))
+
+     ;; Beginning of a comment?
+     (and auto-capitalize-comments
+          auto-capitalize-start-of-inline-comments
+          (save-excursion
+            (when-let* ((comment-start (nth 8 (syntax-ppss))))
+              (= word-start
+                 (save-excursion
+                   (goto-char comment-start)
+                   (skip-syntax-forward "^w")
+                   (point))))))
+
+     ;; Beginning of a string?
+     (and auto-capitalize-strings
+          (save-excursion
+            (goto-char word-start)
+            (when-let* ((string-start (nth 8 (syntax-ppss))))
+              (and (or auto-capitalize-start-of-inline-strings
+                       (progn (goto-char string-start)
+                              (skip-chars-backward "\"'")
+                              (skip-chars-backward " \t")
+                              (bolp)))
+                   (= word-start
+                      (save-excursion
+                        (goto-char string-start)
+                        (skip-syntax-forward "^w")
+                        (point))))))))))
+
+
+(defun auto-capitalize-after-change (beg end length)
+  "If `auto-capitalize-mode' is enabled, then start the capitalization logic.
+
+This function is installed as an `after-change-function' by
+`auto-capitalize-mode'. As such its three arguments are:
+
+BEG, END: buffer positions where the changed text starts and ends,
+respectively.
+
+LENGTH: the length (in chars) of the pre-change text replaced by that
+range. In practice, this is almost always zero, except when yanking text
+and `auto-capitalize-yank' is non-nil.
+
+This function serves as a dispatcher of other functions to decide if the
+word before point (or the yanked text) should be capitalized."
+
+  (condition-case error
+      (let* ((word-start
+              (save-excursion
+                (forward-word -1)
+                (point)))
+             (text-start
+              (save-excursion
+                (goto-char word-start)
+                (cl-loop while (or (minusp (skip-chars-backward "\""))
+                                   (minusp (skip-syntax-backward "\"("))))
+                (point))))
+        (when (or (null auto-capitalize-blocking-functions)
+                  (not (run-hook-with-args-until-success
+                        'auto-capitalize-blocking-functions text-start word-start)))
+
+          (cond
+           ;; We need to check for yanking before checking for trigger chars,
+           ;; because if the yanked text ends in a trigger char, only that
+           ;; trigger char gets processed, meaning the rest of the text does
+           ;; not get capitalized correctly. Checking for yanking first solves
+           ;; this issue.
+           ((and auto-capitalize-yank
+                 ;; `yank' sets `this-command' to t, and the
+                 ;; after-change-functions are run before it has been
+                 ;; reset:
+                 (or (eq this-command 'yank)
+                     (and (= length 0) ; insertion?
+                          (eq this-command 't))))
+            (save-excursion
+              (goto-char beg)
+              (save-match-data
+                (while (re-search-forward "\\Sw" end t)
+                  (setq auto-capitalize--match-data (match-data))
+                  ;; recursion!
+                  (let* ((this-command 'self-insert-command)
+                         (non-word-char (char-after (match-beginning 0)))
+                         (last-command-event non-word-char))
+                    (set-match-data auto-capitalize--match-data)
+                    (auto-capitalize-after-change (match-beginning 0)
+                                                  (match-end 0)
+                                                  0))))))
+
+           ((auto-capitalize--inserted-trigger-char beg end length)
+            ;; Self-inserting, non-word character.
+            (and (> beg (point-min))
+                 (eq (char-syntax (char-before beg)) ?w)
+                 (auto-capitalize--maybe-capitalize
+                  text-start word-start))))))
+    (error (message "auto-capitalize error: %S" error) nil)))
+
+;; Commands
+
+(defun auto-capitalize-add-abbrevs (abbrevs &optional buffer-local)
+  "Add one or more abbreviations to `auto-capitalize-abbrevs'.
+
+ABBREVS is either a string or a list of strings to be added to
+`auto-capitalize-abbrevs'. If BUFFER-LOCAL is non-nil, the new abbrevs
+are added buffer-locally only.
+
+If called interactively, prompts for a single string to add."
+
+  (interactive "sAbbreviation to add: ")
+  (setq abbrevs (ensure-list abbrevs))
+  (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
+                                (nconc auto-capitalize-abbrevs abbrevs)
+                                buffer-local))
+
+(defun auto-capitalize-add-fixed-case-words (words &optional buffer-local)
+  "Add one or more fixed-case words to `auto-capitalize-fixed-case-words'.
+
+WORDS is either a string or a list of strings to be added to
+`auto-capitalize-fixed-case-words'. If BUFFER-LOCAL is non-nil, the new
+words are added buffer-locally only.
+
+If called interactively, prompts for a single string to add."
+
+  (interactive "sFixed case word to add: ")
+  (setq words (ensure-list words))
+  (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
+                                   (nconc auto-capitalize-fixed-case-words words)
+                                   buffer-local))
+
+(defun auto-capitalize-remove-abbrevs (abbrevs &optional buffer-local)
+  "Remove one or more abbreviations from `auto-capitalize-abbrevs'.
+
+ABBREVS is either a string or a list of strings to be removed.
+If BUFFER-LOCAL is non-nil, the change applies buffer-locally only.
+
+Interactively, uses completion to select an existing abbreviation."
+  (interactive
+   (list (completing-read
+          "Abbreviation to remove: "
+          (lambda (string pred action)
+            (if (eq action 'metadata)
+                '(metadata (category . auto-capitalize-abbrev))
+              (complete-with-action action
+                                    auto-capitalize-abbrevs string pred)))
+          nil t)
+         current-prefix-arg))
+  (dolist (abbrev (ensure-list abbrevs))
+    (unless (member abbrev auto-capitalize-abbrevs)
+      (error "%s is not in auto-capitalize-abbrevs" abbrev))
+    (setq auto-capitalize-abbrevs
+          (delete abbrev auto-capitalize-abbrevs)))
+  (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
+                                auto-capitalize-abbrevs
+                                buffer-local))
+
+(defun auto-capitalize-remove-fixed-case-words (words &optional buffer-local)
+  "Remove one or more words from `auto-capitalize-fixed-case-words'.
+
+WORDS is either a string or a list of strings to be removed.
+If BUFFER-LOCAL is non-nil, the change applies buffer-locally only.
+
+Interactively, uses completion to select an existing word."
+  (interactive
+   (list (completing-read
+          "Fixed-case word to remove: "
+          (lambda (string pred action)
+            (if (eq action 'metadata)
+                '(metadata (category . auto-capitalize-fixed-case))
+              (complete-with-action action
+                                    auto-capitalize-fixed-case-words string pred)))
+          nil t nil nil nil t)
+         current-prefix-arg))
+  (dolist (word (ensure-list words))
+    (unless (member word auto-capitalize-fixed-case-words)
+      (error "%s is not in auto-capitalize-fixed-case-words" word))
+    (setq auto-capitalize-fixed-case-words
+          (delete word auto-capitalize-fixed-case-words)))
+  (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
+                                   auto-capitalize-fixed-case-words
+                                   buffer-local))
 
 ;;;###autoload
 (define-minor-mode auto-capitalize-mode
@@ -788,6 +792,5 @@ This will install `auto-capitalize-after-change' in
   :predicate '(not comint-mode))
 
 
-
 (provide 'auto-capitalize)
 ;;; auto-capitalize.el ends here
