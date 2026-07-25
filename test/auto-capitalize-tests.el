@@ -346,7 +346,7 @@ of `auto-capitalize-trigger-chars'."
                     (concat "\\" macro "{A }" ))))))
 
 (ert-deftest auto-capitalize-TeX-ignore-whitelist-macros ()
-  "Don’t follow `TeX-mode' whitelisted macro if the context doesn't makesense."
+  "Don’t follow `TeX-mode' whitelisted macro if the context doesn't make sense."
   (skip-unless (featurep 'auctex))
   (auto-capitalize-tests--setup
    TeX-mode
@@ -480,7 +480,7 @@ of `auto-capitalize-trigger-chars'."
                    "#+begin_src C\na \n#+end_src"))))
 
 (ert-deftest auto-capitalize-org-src-comments ()
-  "Capitalize comments `org-mode' src blocks."
+  "Capitalize comments in `org-mode' src blocks."
   (auto-capitalize-tests--setup
    org-mode
    (let ((org-src-content-indentation 0))
@@ -509,7 +509,7 @@ of `auto-capitalize-trigger-chars'."
                     "#+begin_src C\n/* a  */\n#+end_src")))))
 
 (ert-deftest auto-capitalize-org-src-strings ()
-  "Capitalize strings `org-mode' src blocks."
+  "Capitalize strings in `org-mode' src blocks."
   (auto-capitalize-tests--setup
    org-mode
    (let ((org-src-content-indentation 0))

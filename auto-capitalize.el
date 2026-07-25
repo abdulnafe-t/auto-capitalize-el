@@ -42,10 +42,10 @@
 ;; entry point for the capitalization logic, which is based on two hooks that
 ;; you can add your own predicates to. The `auto-capitalize-blocking-functions'
 ;; hook gives you the right of first refusal over capitalization: each function
-;; in that hook is called with two arguments (TEXT-START WORD-START) and returns non-nil to block
-;; capitalization. If any function returns non-nil, the check fails and no word is
-;; capitalized. Note, however, that even if every function in this hook returns
-;; nil, that does not guarantee a word will be capitalized.
+;; in that hook is called with two arguments (TEXT-START WORD-START) and returns
+;; non-nil to block capitalization. If any function returns non-nil, the check
+;; fails and no word is capitalized. Note, however, that even if every function
+;; in this hook returns nil, that does not guarantee a word will be capitalized.
 ;;
 ;; By default, this hook only contains
 ;; `auto-capitalize-default-blocking-function'. Additional plugins, like the
@@ -199,10 +199,10 @@ change, respectively, as defined by the documentation of
        (memq (char-before end) auto-capitalize-trigger-chars)))
 
 (defun auto-capitalize--downcase-ie (abbrev-start abbrev-end)
-  "Downcase the abbreviation between ABBREV-START and ABBREV-END.
+  "Downcase the abbreviation \"i.e.\" between ABBREV-START and ABBREV-END.
 
- If the user option `auto-capitalize-downcase-ie' is non-nil, and
-the char at ABBREV-START is uppercase, downcase the whole abbreviation."
+If the user option `auto-capitalize-downcase-ie' is non-nil, and the
+char at ABBREV-START is uppercase, downcase the whole abbreviation."
 
   (and auto-capitalize-downcase-ie
        (let ((abbrev-first-char (char-after abbrev-start)))
@@ -438,7 +438,7 @@ If called interactively, prompts for a single string to add."
 
 WORDS is either a string or a list of strings to be added to
 `auto-capitalize-fixed-case-words'. If BUFFER-LOCAL is non-nil, the new
-abbrevs are added buffer-locally only.
+words are added buffer-locally only.
 
 If called interactively, prompts for a single string to add."
 
@@ -456,14 +456,14 @@ If called interactively, prompts for a single string to add."
     (message "")))
 
 (defun auto-capitalize-maybe-capitalize-word (text-start word-start)
-  "Capitalize the word preceding point if either of the following conditions hold:
+  "Capitalize the word at WORD-START if either of the following conditions hold:
 
 1) it appears capitalized in `auto-capitalize-fixed-case-words'
 
 2) `auto-capitalize-check-triggers' returns non-nil.
 
 WORD-START is the position of the start of the word of interest, and
-TEXT-START is the position of before that, having skipped back over any
+TEXT-START is the position before that, having skipped back over any
 open quotes, parens, etc.
 
 Alternatively, if the word is a member of
@@ -567,7 +567,8 @@ If BUFFER-LOCAL is non-nil, only set the buffer-local value."
 (defcustom auto-capitalize-strings t
   "If non-nil, strings in `prog-mode' buffers will be capitalized.
 
-This variable is checked by `auto-capitalize-default-trigger-function'."
+This variable is checked by `auto-capitalize-default-trigger-function'
+and `auto-capitalize-default-blocking-function'."
   :group 'auto-capitalize
   :type 'boolean)
 
@@ -608,7 +609,8 @@ This variable is checked by `auto-capitalize-default-trigger-function'."
 (defcustom auto-capitalize-comments t
   "If non-nil, comments in `prog-mode' buffers will be capitalized.
 
-This variable is checked by `auto-capitalize-default-trigger-function'."
+This variable is checked by `auto-capitalize-default-trigger-function'
+and `auto-capitalize-default-blocking-function'."
   :group 'auto-capitalize
   :type 'boolean)
 
@@ -629,7 +631,7 @@ automatically capitalized or upcased as listed (mixed case is allowable
 as well), even if no other condition would get them capitalized.
 Conversely, a word added in lowercase will never be automatically
 capitalized. This is ensured by the function
-`auto-capitalize-handle-fixed-case', which see"
+`auto-capitalize-handle-fixed-case', which see."
   :group 'auto-capitalize
   :type '(repeat (string :tag "Word list"))
   :set #'auto-capitalize--set-fixed-case)
@@ -662,7 +664,8 @@ getting capitalized when it shouldn't."
 (defcustom auto-capitalize-trigger-chars '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?- ?! ?\n)
   "List of chars that trigger auto-capitalization on the preceding word.
 
-This variable is checked by `auto-capitalize-default-blocking-function'.
+This variable is checked by `auto-capitalize-default-blocking-function'
+and `auto-capitalize-inserted-trigger-char'.
 
 If this variable is nil, it is ignored."
   :group 'auto-capitalize
@@ -711,7 +714,7 @@ their own trigger functions to this hook buffer-locally."
   "Toggle `auto-capitalize' minor mode in the current buffer.
 
 This will install `auto-capitalize-capitalize' in
-`after-change-functions' in the current buffer'."
+`after-change-functions' in the current buffer."
 
   :init-value nil
   :lighter auto-capitalize--lighter

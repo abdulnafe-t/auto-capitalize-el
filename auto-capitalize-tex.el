@@ -9,7 +9,6 @@
 ;;                    (auto-capitalize "3.0")
 ;;                    (auctex "11.82")
 ;;                    (compat "31.0"))
-;;
 ;; Package-Version: 3.0
 ;; Keywords: tex, wp, convenience
 ;; URL: https://github.com/abdulnafe-t/auto-capitalize-el
