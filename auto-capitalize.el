@@ -708,7 +708,7 @@ If called interactively, prompts for a single string to add."
          current-prefix-arg))
   (setq abbrevs (ensure-list abbrevs))
   (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
-                                (nconc auto-capitalize-abbrevs abbrevs)
+                                (append abbrevs auto-capitalize-abbrevs)
                                 buffer-local)
   (message "%s" auto-capitalize-abbrevs))
 
@@ -726,7 +726,7 @@ If called interactively, prompts for a single string to add."
          current-prefix-arg))
   (setq words (ensure-list words))
   (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
-                                   (nconc auto-capitalize-fixed-case-words words)
+                                   (append words auto-capitalize-fixed-case-words)
                                    buffer-local)
   (message "%s" auto-capitalize-fixed-case-words))
 
@@ -748,13 +748,13 @@ Interactively, uses completion to select an existing abbreviation."
                                     auto-capitalize-abbrevs string pred)))
           nil t)
          current-prefix-arg))
-  (dolist (abbrev (ensure-list abbrevs))
+  (setq abbrevs (ensure-list abbrevs))
+  (dolist (abbrev abbrevs)
     (unless (member abbrev auto-capitalize-abbrevs)
-      (error "%s is not in auto-capitalize-abbrevs" abbrev))
-    (setq auto-capitalize-abbrevs
-          (delete abbrev auto-capitalize-abbrevs)))
+      (error "%s is not in auto-capitalize-abbrevs" abbrev)))
   (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
-                                auto-capitalize-abbrevs
+                                (seq-difference auto-capitalize-abbrevs
+                                                abbrevs)
                                 buffer-local)
   (message "%s" auto-capitalize-abbrevs))
 
@@ -776,13 +776,13 @@ Interactively, uses completion to select an existing word."
                                     auto-capitalize-fixed-case-words string pred)))
           nil t nil nil nil t)
          current-prefix-arg))
-  (dolist (word (ensure-list words))
+  (setq words (ensure-list words))
+  (dolist (word words)
     (unless (member word auto-capitalize-fixed-case-words)
-      (error "%s is not in auto-capitalize-fixed-case-words" word))
-    (setq auto-capitalize-fixed-case-words
-          (delete word auto-capitalize-fixed-case-words)))
+      (error "%s is not in auto-capitalize-fixed-case-words" word)))
   (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
-                                   auto-capitalize-fixed-case-words
+                                   (seq-difference auto-capitalize-fixed-case-words
+                                                   words)
                                    buffer-local)
   (message "%s" auto-capitalize-fixed-case-words))
 
