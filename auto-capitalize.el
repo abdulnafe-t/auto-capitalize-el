@@ -429,7 +429,7 @@ are added buffer-locally only.
 
 If called interactively, prompts for a single string to add."
 
-  (interactive "sAbbreviation: ")
+  (interactive "sAbbreviation to add: ")
   (setq abbrevs (ensure-list abbrevs))
   (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
                                 (nconc auto-capitalize-abbrevs abbrevs)
@@ -444,10 +444,62 @@ words are added buffer-locally only.
 
 If called interactively, prompts for a single string to add."
 
-  (interactive "sFixed case word: ")
+  (interactive "sFixed case word to add: ")
   (setq words (ensure-list words))
   (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
                                    (nconc auto-capitalize-fixed-case-words words)
+                                   buffer-local))
+
+(defun auto-capitalize-remove-abbrevs (abbrevs &optional buffer-local)
+  "Remove one or more abbreviations from `auto-capitalize-abbrevs'.
+
+ABBREVS is either a string or a list of strings to be removed.
+If BUFFER-LOCAL is non-nil, the change applies buffer-locally only.
+
+Interactively, uses completion to select an existing abbreviation."
+  (interactive
+   (list (completing-read
+          "Abbreviation to remove: "
+          (lambda (string pred action)
+            (if (eq action 'metadata)
+                '(metadata (category . auto-capitalize-abbrev))
+              (complete-with-action action
+                                    auto-capitalize-abbrevs string pred)))
+          nil t)
+         current-prefix-arg))
+  (dolist (abbrev (ensure-list abbrevs))
+    (unless (member abbrev auto-capitalize-abbrevs)
+      (error "%s is not in auto-capitalize-abbrevs" abbrev))
+    (setq auto-capitalize-abbrevs
+          (delete abbrev auto-capitalize-abbrevs)))
+  (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
+                                auto-capitalize-abbrevs
+                                buffer-local))
+
+(defun auto-capitalize-remove-fixed-case-words (words &optional buffer-local)
+  "Remove one or more words from `auto-capitalize-fixed-case-words'.
+
+WORDS is either a string or a list of strings to be removed.
+If BUFFER-LOCAL is non-nil, the change applies buffer-locally only.
+
+Interactively, uses completion to select an existing word."
+  (interactive
+   (list (completing-read
+          "Fixed-case word to remove: "
+          (lambda (string pred action)
+            (if (eq action 'metadata)
+                '(metadata (category . auto-capitalize-fixed-case))
+              (complete-with-action action
+                                    auto-capitalize-fixed-case-words string pred)))
+          nil t nil nil nil t)
+         current-prefix-arg))
+  (dolist (word (ensure-list words))
+    (unless (member word auto-capitalize-fixed-case-words)
+      (error "%s is not in auto-capitalize-fixed-case-words" word))
+    (setq auto-capitalize-fixed-case-words
+          (delete word auto-capitalize-fixed-case-words)))
+  (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
+                                   auto-capitalize-fixed-case-words
                                    buffer-local))
 
 (defun auto-capitalize--ask ()
