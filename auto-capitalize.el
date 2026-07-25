@@ -298,7 +298,7 @@ the variable `auto-capitalize-fixed-case-words', typing \"i \" produces
                                 :test 'string-equal)
                        t t)))))
 
-(defun auto-capitalize-check-triggers (text-start word-start)
+(defun auto-capitalize--check-triggers (text-start word-start)
   "Return non-nil if the word beginning at WORD-START should be capitalized.
 
 TEXT-START is the first open delimiter before WORD-START, having skipped
@@ -462,7 +462,7 @@ If called interactively, prompts for a single string to add."
 
 1) it appears capitalized in `auto-capitalize-fixed-case-words'
 
-2) `auto-capitalize-check-triggers' returns non-nil.
+2) `auto-capitalize--check-triggers' returns non-nil.
 
 WORD-START is the position of the start of the word of interest, and
 TEXT-START is the position before that, having skipped back over any
@@ -502,7 +502,7 @@ Alternatively, if the word is a member of
 
         (auto-capitalize--downcase-ie (point) (+ (point) 4)))
 
-       ((auto-capitalize-check-triggers
+       ((auto-capitalize--check-triggers
          text-start word-start)
         ;; capitalize!
         (undo-boundary)
