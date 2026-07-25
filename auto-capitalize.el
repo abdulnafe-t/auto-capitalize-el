@@ -277,7 +277,7 @@ word before point (or the yanked text) should be capitalized."
                   text-start word-start))))))
     (error (message "auto-capitalize error: %S" error) nil)))
 
-(defun auto-capitalize-handle-fixed-case (beg end)
+(defun auto-capitalize--handle-fixed-case (beg end)
   "Find the word between BEG and END and replace it with its fixed-case entry.
 
 If the word between BEG and END is included, with its current case,
@@ -484,7 +484,7 @@ Alternatively, if the word is a member of
                           (not (eq (char-syntax (char-after after)) ?w))
                           (memq (char-after after) '(?’ ?')))))))
 
-        (auto-capitalize-handle-fixed-case (match-beginning 0) (match-end 0)))
+        (auto-capitalize--handle-fixed-case (match-beginning 0) (match-end 0)))
 
        ;; HACK: we explicitly look for "I.e." in order to downcase it. The
        ;; idea is that simply typing "i.e." will automatically cause the "i"
@@ -633,7 +633,7 @@ automatically capitalized or upcased as listed (mixed case is allowable
 as well), even if no other condition would get them capitalized.
 Conversely, a word added in lowercase will never be automatically
 capitalized. This is ensured by the function
-`auto-capitalize-handle-fixed-case', which see."
+`auto-capitalize--handle-fixed-case', which see."
   :group 'auto-capitalize
   :type '(repeat (string :tag "Word list"))
   :set #'auto-capitalize--set-fixed-case)

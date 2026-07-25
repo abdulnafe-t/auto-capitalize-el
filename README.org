@@ -144,10 +144,10 @@ job is to run the first layer of logic: it calls all functions in
 ~auto-capitalize--maybe-capitalize~ if you are simply typing, or recursively analyzes
 the text if you are yanking (and ~auto-capitalize-yank~ is non-nil).
 
-~auto-capitalize--maybe-capitalize~ and ~auto-capitalize-handle-fixed-case~ are the
+~auto-capitalize--maybe-capitalize~ and ~auto-capitalize--handle-fixed-case~ are the
 functions actually responsible for capitalizing words. The former checks if the word at
 ~word-start~ matches ~auto-capitalize--fixed-case-regexp~, which is built from
-~auto-capitalize-fixed-case-words~. If it does, it calls ~auto-capitalize-handle-fixed-case~,
+~auto-capitalize-fixed-case-words~. If it does, it calls ~auto-capitalize--handle-fixed-case~,
 which simply replaces the word with its corresponding entry in
 ~auto-capitalize-fixed-case-words~.
 
