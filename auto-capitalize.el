@@ -382,7 +382,13 @@ automatically capitalized or upcased as listed (mixed case is allowable
 as well), even if no other condition would get them capitalized.
 Conversely, a word added in lowercase will never be automatically
 capitalized. This is ensured by the function
-`auto-capitalize--handle-fixed-case', which see."
+`auto-capitalize--handle-fixed-case', which see.
+
+This list should be set with `setopt', the `customize' interface, or
+modified with
+`auto-capitalize-add-fixed-case-words'/`auto-capitalize-remove-fixed-case-words'.
+Changing it with `setq' or `add-to-list' will not work correctly."
+
   :group 'auto-capitalize
   :type '(repeat (string :tag "Word list"))
   :set #'auto-capitalize--set-fixed-case)
@@ -394,7 +400,12 @@ capitalized, unless it appears, capitalized, in
 `auto-capitalize-fixed-case-words'.
 
 This list is checked by `auto-capitalize-default-blocking-function',
-which see."
+which see.
+
+This list should be set with `setopt', the `customize' interface, or
+modified with
+`auto-capitalize-add-abbrevs'/`auto-capitalize-remove-abbrevs'. Changing
+it with `setq' or `add-to-list' will not work correctly."
 
   :group 'auto-capitalize
   :type '(repeat (string :tag "Non-sentence ending word."))
