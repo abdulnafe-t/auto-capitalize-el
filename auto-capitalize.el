@@ -188,7 +188,7 @@ the corresponding user options.
                                 ,(command-remapping 'self-insert-command)))
            (not (memq last-command-event auto-capitalize-trigger-chars)))))
 
-(defun auto-capitalize-inserted-trigger-char (beg end length)
+(defun auto-capitalize--inserted-trigger-char (beg end length)
   "Return non-nil if the inserted text ends with a trigger character.
 
 BEG, END, and LENGTH are the position in the buffer where the change
@@ -269,7 +269,7 @@ word before point (or the yanked text) should be capitalized."
                                                 (match-end 0)
                                                 0))))))
 
-           ((auto-capitalize-inserted-trigger-char beg end length)
+           ((auto-capitalize--inserted-trigger-char beg end length)
             ;; Self-inserting, non-word character.
             (and (> beg (point-min))
                  (eq (char-syntax (char-before beg)) ?w)
@@ -667,7 +667,7 @@ getting capitalized when it shouldn't."
   "List of chars that trigger auto-capitalization on the preceding word.
 
 This variable is checked by `auto-capitalize-default-blocking-function'
-and `auto-capitalize-inserted-trigger-char'.
+and `auto-capitalize--inserted-trigger-char'.
 
 If this variable is nil, it is ignored."
   :group 'auto-capitalize
