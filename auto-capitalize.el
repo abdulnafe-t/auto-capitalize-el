@@ -277,16 +277,16 @@ word before point (or the yanked text) should be capitalized."
                   text-start word-start))))))
     (error (message "auto-capitalize error: %S" error) nil)))
 
-(defun auto-capitalize-handle-fixed-case (m-beg m-end)
-  "Find the word between M-BEG and M-END and replace it with its fixed-case entry.
+(defun auto-capitalize-handle-fixed-case (beg end)
+  "Find the word between BEG and END and replace it with its fixed-case entry.
 
-If the word between M-BEG and M-END is included, with its current case,
+If the word between BEG and END is included, with its current case,
 in `auto-capitalize-fixed-case-words', replace its occurrence in the
 buffer with the one in the list. For example, using the default value of
 the variable `auto-capitalize-fixed-case-words', typing \"i \" produces
 \"I \"."
 
-  (let ((lowercase-word (buffer-substring m-beg m-end)))
+  (let ((lowercase-word (buffer-substring beg end)))
     (unless (member lowercase-word auto-capitalize-fixed-case-words)
       ;; capitalize!
       (undo-boundary)
