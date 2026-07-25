@@ -47,8 +47,11 @@
 (defvar auto-capitalize-org--lighter "/Org"
   "Appended to `auto-capitalize--lighter' by `auto-capitalize-org-mode'.")
 
-(defun auto-capitalize-org-blocking-function ()
+(defun auto-capitalize-org-blocking-function (_text-start _word-start)
   "Block capitalization in org mode if appropriate.
+
+TEXT-START and WORD-START are the positions of the start of the
+current text and the start of the current word, respectively.
 
 Specifically, return non-nil to block capitalization if either:
 

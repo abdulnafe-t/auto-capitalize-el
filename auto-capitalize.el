@@ -42,7 +42,7 @@
 ;; entry point for the capitalization logic, which is based on two hooks that
 ;; you can add your own predicates to. The `auto-capitalize-blocking-functions'
 ;; hook gives you the right of first refusal over capitalization: each function
-;; in that hook is called with no arguments and returns non-nil to block
+;; in that hook is called with two arguments (TEXT-START WORD-START) and returns non-nil to block
 ;; capitalization. If any function returns non-nil, the check fails and no word is
 ;; capitalized. Note, however, that even if every function in this hook returns
 ;; nil, that does not guarantee a word will be capitalized.
@@ -126,8 +126,11 @@ the regexp on every keystroke, and by
 
 ;; Internal functions:
 
-(defun auto-capitalize-default-blocking-function ()
+(defun auto-capitalize-default-blocking-function (_text-start word-start)
   "Block auto-capitalization if the current context demands it.
+
+TEXT-START and WORD-START are the positions of the start of the current
+text and the start of the current word, respectively.
 
 Specifically, check the current buffer for the following conditions, and
 return non-nil to block capitalization if any of them hold:
@@ -157,25 +160,25 @@ the corresponding user options.
       ;; If not in prog-mode, don't block if outside of comments or strings,
       ;; and only block inside comments or strings if the corresponding option
       ;; is nil.
-      (if (derived-mode-p 'prog-mode)
-          (and
-           (or (not auto-capitalize-strings) (not (nth 3 (syntax-ppss))))
-           (or (not auto-capitalize-comments) (not (nth 4 (syntax-ppss)))))
-        (or
-         (and (nth 3 (syntax-ppss)) (not auto-capitalize-strings))
-         (and (nth 4 (syntax-ppss)) (not auto-capitalize-comments))))
-
-      ;; Block capitalization after any word in `auto-capitalize-abbrevs',
-      ;; unless the current word is one in `auto-capitalize-fixed-case-words'
-
       (save-excursion
-        (backward-word)
-        (let ((word-start (point)))
-          (and (not (looking-at auto-capitalize--fixed-case-regexp))
-               (re-search-backward
-                auto-capitalize--abbrevs-regexp
-                (line-beginning-position) t)
-               (= (1+ (match-end 0)) word-start))))
+        (goto-char word-start)
+        (or
+         (if (derived-mode-p 'prog-mode)
+             (and
+              (or (not auto-capitalize-strings) (not (nth 3 (syntax-ppss))))
+              (or (not auto-capitalize-comments) (not (nth 4 (syntax-ppss)))))
+           (or
+            (and (nth 3 (syntax-ppss)) (not auto-capitalize-strings))
+            (and (nth 4 (syntax-ppss)) (not auto-capitalize-comments))))
+
+         ;; Block capitalization after any word in `auto-capitalize-abbrevs',
+         ;; unless the current word is one in `auto-capitalize-fixed-case-words'
+
+         (and (not (looking-at auto-capitalize--fixed-case-regexp))
+              (re-search-backward
+               auto-capitalize--abbrevs-regexp
+               (line-beginning-position) t)
+              (= (1+ (match-end 0)) word-start))))
 
       ;; Only capitalize after typing or yanking text, but only after
       ;; `auto-capitalize-trigger-chars'
@@ -224,47 +227,53 @@ This function serves as a dispatcher of other functions to decide if the
 word before point (or the yanked text) should be capitalized."
 
   (condition-case error
-      (when (or (null auto-capitalize-blocking-functions)
-                (save-excursion
-                  ;; HACK: we move back one char to account for newline possibly
-                  ;; leaving the actual word's context, such as at the end of a
-                  ;; comment
-                  (unless (bobp)
-                    (backward-char))
+      (let* ((word-start
+              (save-excursion
+                (forward-word -1)
+                (point)))
+             (text-start
+              (save-excursion
+                (goto-char word-start)
+                (cl-loop while (or (minusp (skip-chars-backward "\""))
+                                   (minusp (skip-syntax-backward "\"("))))
+                (point))))
+        (when (or (null auto-capitalize-blocking-functions)
                   (not (run-hook-with-args-until-success
-                        'auto-capitalize-blocking-functions))))
+                        'auto-capitalize-blocking-functions text-start word-start)))
 
-        (cond
-         ;; We need to check for yanking before checking for trigger chars,
-         ;; because if the yanked text ends in a trigger char, only that trigger
-         ;; char gets processed, meaning the rest of the text does not get
-         ;; capitalized correctly. Checking for yanking first solves this issue.
-         ((and auto-capitalize-yank
-               ;; `yank' sets `this-command' to t, and the
-               ;; after-change-functions are run before it has been
-               ;; reset:
-               (or (eq this-command 'yank)
-                   (and (= length 0) ; insertion?
-                        (eq this-command 't))))
-          (save-excursion
-            (goto-char beg)
-            (save-match-data
-              (while (re-search-forward "\\Sw" end t)
-                (setq auto-capitalize--match-data (match-data))
-                ;; recursion!
-                (let* ((this-command 'self-insert-command)
-                       (non-word-char (char-after (match-beginning 0)))
-                       (last-command-event non-word-char))
-                  (set-match-data auto-capitalize--match-data)
-                  (auto-capitalize-capitalize (match-beginning 0)
-                                              (match-end 0)
-                                              0))))))
+          (cond
+           ;; We need to check for yanking before checking for trigger chars,
+           ;; because if the yanked text ends in a trigger char, only that
+           ;; trigger char gets processed, meaning the rest of the text does
+           ;; not get capitalized correctly. Checking for yanking first solves
+           ;; this issue.
+           ((and auto-capitalize-yank
+                 ;; `yank' sets `this-command' to t, and the
+                 ;; after-change-functions are run before it has been
+                 ;; reset:
+                 (or (eq this-command 'yank)
+                     (and (= length 0) ; insertion?
+                          (eq this-command 't))))
+            (save-excursion
+              (goto-char beg)
+              (save-match-data
+                (while (re-search-forward "\\Sw" end t)
+                  (setq auto-capitalize--match-data (match-data))
+                  ;; recursion!
+                  (let* ((this-command 'self-insert-command)
+                         (non-word-char (char-after (match-beginning 0)))
+                         (last-command-event non-word-char))
+                    (set-match-data auto-capitalize--match-data)
+                    (auto-capitalize-capitalize (match-beginning 0)
+                                                (match-end 0)
+                                                0))))))
 
-         ((auto-capitalize-inserted-trigger-char beg end length)
-          ;; Self-inserting, non-word character.
-          (and (> beg (point-min))
-               (eq (char-syntax (char-before beg)) ?w)
-               (auto-capitalize-maybe-capitalize-preceding-word)))))
+           ((auto-capitalize-inserted-trigger-char beg end length)
+            ;; Self-inserting, non-word character.
+            (and (> beg (point-min))
+                 (eq (char-syntax (char-before beg)) ?w)
+                 (auto-capitalize-maybe-capitalize-preceding-word
+                  text-start word-start))))))
     (error (message "auto-capitalize error: %S" error) nil)))
 
 (defun auto-capitalize-handle-fixed-case (m-beg m-end)
@@ -446,60 +455,57 @@ If called interactively, prompts for a single string to add."
                   (buffer-substring (match-beginning 0) (match-end 0))))
     (message "")))
 
-(defun auto-capitalize-maybe-capitalize-preceding-word ()
+(defun auto-capitalize-maybe-capitalize-preceding-word (text-start word-start)
   "Capitalize the word preceding point if either of the following conditions hold:
 
 1) it appears capitalized in `auto-capitalize-fixed-case-words'
 
 2) `auto-capitalize-check-triggers' returns non-nil.
 
+WORD-START is the position of the start of the word of interest, and
+TEXT-START is the position of before that, having skipped back over any
+open quotes, parens, etc.
+
 Alternatively, if the word is a member of
 `auto-capitalize-abbrevs', then it is downcased by calling
 `auto-capitalize--downcase-ie'."
 
   (save-excursion
-    (forward-word -1)
     (save-match-data
-      (let* ((word-start (point))
-             (text-start
-	      (progn
-		(cl-loop while (or (minusp (skip-chars-backward "\""))
-			           (minusp (skip-syntax-backward "\"("))))
-		(point))))
-        (cond
+      (cond
+       ((and auto-capitalize--fixed-case-regexp
+             (let ((case-fold-search nil))
+               (goto-char word-start)
+               (and (looking-at auto-capitalize--fixed-case-regexp)
+                    (let ((after (match-end 0)))
+                      (or (>= after (point-max))
+                          (not (eq (char-syntax (char-after after)) ?w))
+                          (memq (char-after after) '(?’ ?')))))))
 
-         ((and auto-capitalize--fixed-case-regexp
-               (let ((case-fold-search nil))
-                 (goto-char word-start)
-                 (and (looking-at auto-capitalize--fixed-case-regexp)
-                      (let ((after (match-end 0)))
-                        (or (>= after (point-max))
-                            (not (eq (char-syntax (char-after after)) ?w))
-                            (memq (char-after after) '(?’ ?')))))))
+        (auto-capitalize-handle-fixed-case (match-beginning 0) (match-end 0)))
 
-          (auto-capitalize-handle-fixed-case (match-beginning 0) (match-end 0)))
-
-         ;; HACK: we explicitly look for "I.e." in order to downcase it. The
-         ;; idea is that simply typing "i.e." will automatically cause the "i"
-         ;; to get capitalized, assuming "I" is in
-         ;; `auto-capitalize-fixed-case-words'. In order to prevent that from
-         ;; happening if the user is actually typing "i.e.", we always force the
-         ;; latter to be lowercase.
-         ;;
-         ;; The price to pay is that even if the user types capital I, with the
-         ;; intent of typing "I.e.", it gets downcased anyway.
-         ((progn
-            (skip-chars-backward "[[:alpha:]].")
-            (looking-at "I.e."))
-
-          (auto-capitalize--downcase-ie (point) (+ (point) 4)))
-
-         ((auto-capitalize-check-triggers
-           text-start word-start)
-          ;; capitalize!
-          (undo-boundary)
+       ;; HACK: we explicitly look for "I.e." in order to downcase it. The
+       ;; idea is that simply typing "i.e." will automatically cause the "i"
+       ;; to get capitalized, assuming "I" is in
+       ;; `auto-capitalize-fixed-case-words'. In order to prevent that from
+       ;; happening if the user is actually typing "i.e.", we always force the
+       ;; latter to be lowercase.
+       ;;
+       ;; The price to pay is that even if the user types capital I, with the
+       ;; intent of typing "I.e.", it gets downcased anyway.
+       ((progn
           (goto-char word-start)
-          (capitalize-word 1)))))))
+          (skip-chars-backward "[[:alpha:]].")
+          (looking-at "I.e."))
+
+        (auto-capitalize--downcase-ie (point) (+ (point) 4)))
+
+       ((auto-capitalize-check-triggers
+         text-start word-start)
+        ;; capitalize!
+        (undo-boundary)
+        (goto-char word-start)
+        (capitalize-word 1))))))
 
 (defun auto-capitalize--set-fixed-case (sym val &optional buffer-local)
   "Setter for `auto-capitalize-fixed-case-words'.
@@ -669,8 +675,8 @@ If this variable is nil, it is ignored."
   (list #'auto-capitalize-default-blocking-function)
   "Hook providing the right of first refusal over capitalization.
 
-Each function is called with no arguments and should return non-nil to
-block capitalization in the current context.
+Each function is called with two arguments (TEXT-START WORD-START) and
+should return non-nil to block capitalization in the current context.
 
 Plugins like `auto-capitalize-org' and `auto-capitalize-tex' can add
 their own blocking functions to this hook buffer-locally."
