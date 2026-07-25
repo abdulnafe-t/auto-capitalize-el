@@ -698,12 +698,14 @@ word before point (or the yanked text) should be capitalized."
   "Add one or more abbreviations to `auto-capitalize-abbrevs'.
 
 ABBREVS is either a string or a list of strings to be added to
-`auto-capitalize-abbrevs'. If BUFFER-LOCAL is non-nil, the new abbrevs
-are added buffer-locally only.
+`auto-capitalize-abbrevs'. If BUFFER-LOCAL is non-nil (such as with a
+prefix arg), the new abbrevs are added buffer-locally only.
 
 If called interactively, prompts for a single string to add."
 
-  (interactive "sAbbreviation to add: ")
+  (interactive
+   (list (read-string "Abbreviation to add: ")
+         current-prefix-arg))
   (setq abbrevs (ensure-list abbrevs))
   (auto-capitalize--set-abbrevs 'auto-capitalize-abbrevs
                                 (nconc auto-capitalize-abbrevs abbrevs)
@@ -714,12 +716,14 @@ If called interactively, prompts for a single string to add."
   "Add one or more fixed-case words to `auto-capitalize-fixed-case-words'.
 
 WORDS is either a string or a list of strings to be added to
-`auto-capitalize-fixed-case-words'. If BUFFER-LOCAL is non-nil, the new
-words are added buffer-locally only.
+`auto-capitalize-fixed-case-words'. If BUFFER-LOCAL is non-nil (such as
+with a prefix arg), the new words are added buffer-locally only.
 
 If called interactively, prompts for a single string to add."
 
-  (interactive "sFixed case word to add: ")
+  (interactive
+   (list (read-string "Abbreviation to add: ")
+         current-prefix-arg))
   (setq words (ensure-list words))
   (auto-capitalize--set-fixed-case 'auto-capitalize-fixed-case-words
                                    (nconc auto-capitalize-fixed-case-words words)
