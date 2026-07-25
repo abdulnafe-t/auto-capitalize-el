@@ -627,8 +627,8 @@ docstrings."
   "Capitalize the first word (and no other words) in `python-mode' function
 docstrings."
   (auto-capitalize-tests--setup
-   emacs-lisp-mode
-   (insert "(def test-func ()")
+   python-mode
+   (insert "def test-func:")
    (ert-simulate-command '(newline))
    (insert "\"\"\"\"\"\"")
    (backward-char 3)
@@ -637,7 +637,7 @@ docstrings."
    (ert-simulate-command '(self-insert-command 1 ?a))
    (ert-simulate-command '(self-insert-command 1 ?\s))
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                  "(def test-func ()\n\"\"\"A a \"\"\""))))
+                  "def test-func:\n\"\"\"A a \"\"\""))))
 
 (ert-deftest auto-capitalize-prog-start-of-inline-strings ()
   "Test `auto-capitalize-start-of-inline-strings' off and on,
