@@ -771,7 +771,7 @@ Interactively, uses completion to select an existing word."
           "Fixed-case word to remove: "
           (lambda (string pred action)
             (if (eq action 'metadata)
-                '(metadata (category . auto-capitalize-fixed-case))
+                '(metadata (category . auto-capitalize-fixed-case-words))
               (complete-with-action action
                                     auto-capitalize-fixed-case-words string pred)))
           nil t nil nil nil t)
