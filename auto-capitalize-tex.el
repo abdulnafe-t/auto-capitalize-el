@@ -72,8 +72,8 @@ are already handled by the outline-heading check in
 (defun auto-capitalize-tex-blocking-function (_text-start word-start)
   "Block capitalization in TeX when appropriate.
 
-TEXT-START is the position of the start of the current text, and
-WORD-START is the position of the start of the current word.
+WORD-START is the position of the start of the current word; TEXT-START
+is ignored.
 
 This predicate blocks capitalization in `TeX-mode' buffers inside of
 math envs. It also prevents capitalization of TeX macros.

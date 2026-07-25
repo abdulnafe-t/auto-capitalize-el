@@ -323,11 +323,10 @@ only capitalize if the user answered \"y\"."
    (or (not auto-capitalize-ask)
        (auto-capitalize--ask))
 
-   (goto-char text-start)
    (run-hook-with-args-until-success
     'auto-capitalize-trigger-functions text-start word-start)))
 
-(defun auto-capitalize-default-trigger-function (_text-start word-start)
+(defun auto-capitalize-default-trigger-function (text-start word-start)
   "Check the context around TEXT-START/WORD-START.
 
 This predicate returns non-nil if any of the following conditions hold:
@@ -356,68 +355,70 @@ non-nil.
 `auto-capitalize-start-of-inline-strings', if the string is inline) are
 non-nil."
 
-  (or
+  (save-excursion
+    (goto-char text-start)
+    (or
 
-   (and (derived-mode-p 'text-mode)
-        (or (bobp)
-            (and auto-capitalize-outline-headings
-                 (bound-and-true-p outline-regexp)
-                 (save-excursion
-                   (goto-char (line-beginning-position))
-                   (when (looking-at outline-regexp)
-                     (goto-char (match-end 0))
-                     (skip-syntax-forward "^w" (line-end-position))
-                     (= word-start (point)))))))
+     (and (derived-mode-p 'text-mode)
+          (or (bobp)
+              (and auto-capitalize-outline-headings
+                   (bound-and-true-p outline-regexp)
+                   (save-excursion
+                     (goto-char (line-beginning-position))
+                     (when (looking-at outline-regexp)
+                       (goto-char (match-end 0))
+                       (skip-syntax-forward "^w" (line-end-position))
+                       (= word-start (point)))))))
 
-   ;; Beginning of paragraph?
-   (or (= word-start
-          (save-excursion
-            (start-of-paragraph-text)
-            (skip-syntax-forward "^w")
-            (point)))
+     ;; Beginning of paragraph?
+     (or (= word-start
+            (save-excursion
+              (start-of-paragraph-text)
+              (skip-syntax-forward "^w")
+              (point)))
+         (save-excursion
+           (goto-char word-start)
+           (skip-syntax-backward "\s")
+           (backward-char)
+           (looking-at "\n")))
+
+     ;; Beginning of a sentence?
+     (if-let* ((bounds (car (bounds-of-thing-at-point 'sentence))))
+         (= word-start
+            (save-excursion
+              (goto-char bounds)
+              (skip-syntax-forward "^w")
+              (point)))
        (save-excursion
-         (goto-char word-start)
-         (skip-syntax-backward "\s")
-         (backward-char)
-         (looking-at "\n")))
+         (skip-syntax-backward "^w" (line-beginning-position))
+         (looking-at (sentence-end))))
 
-   ;; Beginning of a sentence?
-   (if-let* ((bounds (car (bounds-of-thing-at-point 'sentence))))
-       (= word-start
+     ;; Beginning of a comment?
+     (and auto-capitalize-comments
+          auto-capitalize-start-of-inline-comments
           (save-excursion
-            (goto-char bounds)
-            (skip-syntax-forward "^w")
-            (point)))
-     (save-excursion
-       (skip-syntax-backward "^w" (line-beginning-position))
-       (looking-at (sentence-end))))
+            (when-let* ((comment-start (nth 8 (syntax-ppss))))
+              (= word-start
+                 (save-excursion
+                   (goto-char comment-start)
+                   (skip-syntax-forward "^w")
+                   (point))))))
 
-   ;; Beginning of a comment?
-   (and auto-capitalize-comments
-        auto-capitalize-start-of-inline-comments
-        (save-excursion
-          (when-let* ((comment-start (nth 8 (syntax-ppss))))
-            (= word-start
-               (save-excursion
-                 (goto-char comment-start)
-                 (skip-syntax-forward "^w")
-                 (point))))))
-
-   ;; Beginning of a string?
-   (and auto-capitalize-strings
-        (save-excursion
-          (goto-char word-start)
-          (when-let* ((string-start (nth 8 (syntax-ppss))))
-            (and (or auto-capitalize-start-of-inline-strings
-                     (progn (goto-char string-start)
-                            (skip-chars-backward "\"'")
-                            (skip-chars-backward " \t")
-                            (bolp)))
-                 (= word-start
-                    (save-excursion
-                      (goto-char string-start)
-                      (skip-syntax-forward "^w")
-                      (point)))))))))
+     ;; Beginning of a string?
+     (and auto-capitalize-strings
+          (save-excursion
+            (goto-char word-start)
+            (when-let* ((string-start (nth 8 (syntax-ppss))))
+              (and (or auto-capitalize-start-of-inline-strings
+                       (progn (goto-char string-start)
+                              (skip-chars-backward "\"'")
+                              (skip-chars-backward " \t")
+                              (bolp)))
+                   (= word-start
+                      (save-excursion
+                        (goto-char string-start)
+                        (skip-syntax-forward "^w")
+                        (point))))))))))
 
 (defun auto-capitalize-add-abbrevs (abbrevs &optional buffer-local)
   "Add one or more abbreviations to `auto-capitalize-abbrevs'.
