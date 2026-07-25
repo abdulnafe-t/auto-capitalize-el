@@ -120,6 +120,7 @@ the regexp on every keystroke, and by
 (defvar auto-capitalize-fixed-case-words)
 (defvar auto-capitalize-abbrevs)
 (defvar auto-capitalize-trigger-chars)
+(defvar auto-capitalize-trigger-functions)
 (defvar auto-capitalize-blocking-functions)
 (defvar auto-capitalize-downcase-ie)
 
