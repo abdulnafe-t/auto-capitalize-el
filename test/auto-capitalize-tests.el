@@ -30,7 +30,7 @@
 (require 'auto-capitalize-org)
 (when (featurep 'auctex)
   (require 'auto-capitalize-tex))
-(require 'font-lock)                    ; For `font-lock-ensure', `font-lock-mode'
+(require 'font-lock)                    ; For `font-lock-ensure'
 
 (defmacro auto-capitalize-tests--setup (mode &rest body)
   "Set up a buffer for auto-capitalize-tests."
@@ -45,7 +45,6 @@
      (when (and (derived-mode-p 'org-mode)
                 (fboundp 'auto-capitalize-org-mode))
        (auto-capitalize-org-mode 1))
-     (font-lock-mode 1)
      (progn ,@body)))
 
 
@@ -502,7 +501,6 @@ of `auto-capitalize-trigger-chars'."
      (insert "#+begin_src C\n\n#+end_src")
      (forward-line -1)
      (ert-simulate-command '(comment-dwim 2))
-     (font-lock-ensure)
      (ert-simulate-command '(self-insert-command 1 ?a))
      (ert-simulate-command '(self-insert-command 1 ?\s))
      (should (equal (buffer-substring-no-properties (point-min) (point-max))
@@ -778,7 +776,6 @@ for both inline comments and newline-based (BOL) comments."
   (auto-capitalize-tests--setup
    nxml-mode
    (ert-simulate-command '(comment-dwim 2))
-   (font-lock-ensure)
    (ert-simulate-command '(self-insert-command 1 ?a))
    (ert-simulate-command '(self-insert-command 1 ?\s))
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
@@ -787,7 +784,6 @@ for both inline comments and newline-based (BOL) comments."
    (erase-buffer)
    (let ((auto-capitalize-comments nil))
      (ert-simulate-command '(comment-dwim 2))
-     (font-lock-ensure)
      (ert-simulate-command '(self-insert-command 1 ?a))
      (ert-simulate-command '(self-insert-command 1 ?\s))
      (should (equal (buffer-substring-no-properties (point-min) (point-max))

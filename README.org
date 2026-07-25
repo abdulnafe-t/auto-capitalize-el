@@ -40,7 +40,7 @@ And that’s pretty much it. Start typing to try it out!
 
 * Requirements
 
-The core package requires ~font-lock~ to detect comments and strings, since it relies heavily on ~syntax-ppss~. =auto-capitalize-tex.el= requires [[https://www.gnu.org/software/auctex/][AUCTeX]].
+=auto-capitalize-org.el= requires ~font-lock~ to detect comments and strings in ~org-mode~ src-blocks, and ~org-src-fontify-natively~ must therefore be non-nil. =auto-capitalize-tex.el= requires [[https://www.gnu.org/software/auctex/][AUCTeX]].
 
 * Customization
 
