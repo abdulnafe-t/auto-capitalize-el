@@ -517,8 +517,8 @@ of `auto-capitalize-trigger-chars'."
      (backward-char)
      (ert-simulate-command '(self-insert-command 1 ?a))
      (ert-simulate-command '(self-insert-command 1 ?\s))
-      (should (equal (buffer-string)
-                     "#+begin_src C\n\"A \"\n#+end_src")))))
+     (should (equal (buffer-string)
+                    "#+begin_src C\n\"A \"\n#+end_src")))))
 
 (ert-deftest auto-capitalize-org-src-strings-disabled ()
   "Don't capitalize strings in src blocks when `auto-capitalize-strings' is nil."
