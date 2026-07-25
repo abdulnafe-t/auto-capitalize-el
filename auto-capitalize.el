@@ -151,13 +151,13 @@ char at ABBREV-START is uppercase, downcase the whole abbreviation."
            (downcase-region abbrev-start abbrev-end)))))
 
 (defun auto-capitalize--handle-fixed-case (beg end)
-  "Find the word between BEG and END and replace it with its fixed-case entry.
+  "Replace the word between BEG and END with its fixed-case entry.
 
-If the word between BEG and END is included, with its current case,
-in `auto-capitalize-fixed-case-words', replace its occurrence in the
-buffer with the one in the list. For example, using the default value of
-the variable `auto-capitalize-fixed-case-words', typing \"i \" produces
-\"I \"."
+If the word between BEG and END is included in
+`auto-capitalize-fixed-case-words', replace its occurrence in the buffer
+with the one in the list. For example, using the default value of the
+variable `auto-capitalize-fixed-case-words', typing \"i \" produces \"I
+\"."
 
   (let ((lowercase-word (buffer-substring beg end)))
     (unless (member lowercase-word auto-capitalize-fixed-case-words)
@@ -217,8 +217,7 @@ WORD-START is the position of the start of the word of interest, and
 TEXT-START is the position before that, having skipped back over any
 open quotes, parens, etc.
 
-Alternatively, if the word is a member of
-`auto-capitalize-abbrevs', then it is downcased by calling
+Alternatively, if the word is \"I.e.\", then it is downcased by calling
 `auto-capitalize--downcase-ie'."
 
   (save-excursion
@@ -235,15 +234,14 @@ Alternatively, if the word is a member of
 
         (auto-capitalize--handle-fixed-case (match-beginning 0) (match-end 0)))
 
-       ;; HACK: we explicitly look for "I.e." in order to downcase it. The
-       ;; idea is that simply typing "i.e." will automatically cause the "i"
-       ;; to get capitalized, assuming "I" is in
-       ;; `auto-capitalize-fixed-case-words'. In order to prevent that from
-       ;; happening if the user is actually typing "i.e.", we always force the
-       ;; latter to be lowercase.
+       ;; HACK: we explicitly look for "I.e." in order to downcase it. The idea
+       ;; is that simply typing "i.e." will automatically cause the "i" to get
+       ;; capitalized, assuming "I" is in `auto-capitalize-fixed-case-words'. In
+       ;; order to prevent that from happening if the user is actually typing
+       ;; "i.e.", we always force this specific abbreviation to be lowercase.
        ;;
        ;; The price to pay is that even if the user types capital I, with the
-       ;; intent of typing "I.e.", it gets downcased anyway.
+       ;; intent of typing "I.e.", it still gets downcased.
        ((progn
           (goto-char word-start)
           (skip-chars-backward "[[:alpha:]].")
@@ -264,7 +262,7 @@ Alternatively, if the word is a member of
 Updates it (SYM) with the new value (VAL) and rebuilds the cached regexp
 `auto-capitalize--fixed-case-regexp'.
 
-If BUFFER-LOCAL is non-nil, only set the buffer-local value."
+If BUFFER-LOCAL is non-nil, only sets the buffer-local value."
   (if buffer-local
       (progn
         (set-local sym val)
@@ -284,7 +282,7 @@ If BUFFER-LOCAL is non-nil, only set the buffer-local value."
 Updates it (SYM) with the new value (VAL) and rebuilds the cached regexp
 `auto-capitalize--abbrevs-regexp'.
 
-If BUFFER-LOCAL is non-nil, only set the buffer-local value."
+If BUFFER-LOCAL is non-nil, only sets the buffer-local value."
   (if buffer-local
       (progn
         (set-local sym val)
@@ -378,14 +376,13 @@ which see."
 
 If `auto-capitalize' mode is on, and as long as
 `auto-capitalize-blocking-functions' pass, these words will be
-automatically capitalized or upcased as listed (mixed case is allowable
-as well), even if no other condition would get them capitalized.
-Conversely, a word added in lowercase will never be automatically
-capitalized. This is ensured by the function
-`auto-capitalize--handle-fixed-case', which see.
+automatically capitalized or upcased as listed (mixed case is allowed as
+well), even if no other condition would get them capitalized.
+Conversely, a word added in lowercase will always get downcased. This is
+ensured by the function `auto-capitalize--handle-fixed-case', which see.
 
-This list should be set with `setopt', the `customize' interface, or
-modified with
+This list should be set with `setopt', the `customize' interface, the
+`:custom' keyword in `use-package', or modified with
 `auto-capitalize-add-fixed-case-words'/`auto-capitalize-remove-fixed-case-words'.
 Changing it with `setq' or `add-to-list' will not work correctly."
 
@@ -402,8 +399,8 @@ capitalized, unless it appears, capitalized, in
 This list is checked by `auto-capitalize-default-blocking-function',
 which see.
 
-This list should be set with `setopt', the `customize' interface, or
-modified with
+This list should be set with `setopt', the :custom keyword in
+`use-package', the `customize' interface, or modified with
 `auto-capitalize-add-abbrevs'/`auto-capitalize-remove-abbrevs'. Changing
 it with `setq' or `add-to-list' will not work correctly."
 
@@ -472,7 +469,7 @@ their own trigger functions to this hook buffer-locally."
 ;; User-facing functions
 
 (defun auto-capitalize-default-blocking-function (_text-start word-start)
-  "Block auto-capitalization if the current context demands it.
+  "Block auto-capitalization if the context demands it.
 
 TEXT-START and WORD-START are the positions of the start of the current
 text and the start of the current word, respectively.
@@ -487,11 +484,11 @@ return non-nil to block capitalization if any of them hold:
 3) if in `prog-mode', the current text is in neither a comment nor a
 string, or it is but the corresponding user
 option (`auto-capitalize-comments' or `auto-capitalize-strings') is nil.
-Outside of `prog-mode', text outside of comments or strings is not
-blocked, while capitalization in comments/strings is similarly gated by
-the corresponding user options.
+Outside of `prog-mode', capitalizing text other than comments or strings
+is not blocked, while capitalization in comments/strings is similarly
+gated by the corresponding user options.
 
-4) if the previous word is in `auto-capitalize-abbrevs'
+4) if the word preceding WORD-START is in `auto-capitalize-abbrevs'
 
 5) the last typed character was not one of
 `auto-capitalize-trigger-chars'."
@@ -534,7 +531,7 @@ the corresponding user options.
 
 
 (defun auto-capitalize-default-trigger-function (text-start word-start)
-  "Check the context around TEXT-START/WORD-START.
+  "Check whether to capitalize the word at WORD-START.
 
 This predicate returns non-nil if any of the following conditions hold:
 
@@ -686,8 +683,8 @@ word before point (or the yanked text) should be capitalized."
                                                   (match-end 0)
                                                   0))))))
 
+           ;; Self-inserting trigger character.
            ((auto-capitalize--inserted-trigger-char beg end length)
-            ;; Self-inserting, non-word character.
             (and (> beg (point-min))
                  (eq (char-syntax (char-before beg)) ?w)
                  (auto-capitalize--maybe-capitalize
