@@ -50,9 +50,10 @@ requires [[https://www.gnu.org/software/auctex/][AUCTeX]].
 
 * Customization
 
-Things should just work for most users, with sensible defaults. However, there are
-customization options in the ~auto-capitalize~ group. Those should let you get the behavior
-you want.
+Things should just work for most users, with sensible defaults. ~auto-capitalize-mode~
+respects your settings such as ~sentence-end-double-space~ and ~paragraph-indent-minor-mode~.
+However, there are customization options in the ~auto-capitalize~ group, which should let
+you get the exact behavior you want.
 
 If you want to limit auto-capitalization to certain modes instead of enabling it globally,
 replace ~auto-capitalize-global-mode~ in the snippets above with ~auto-capitalize-mode~, which
