@@ -109,8 +109,9 @@ the regexp on every keystroke, and by
 
 (defvar auto-capitalize--syntax-table
   (let ((st (make-syntax-table)))
-    (modify-syntax-entry ?' "_" st)
-    (modify-syntax-entry ?’ "_" st)
+    (modify-syntax-entry ?' "." st)
+    (modify-syntax-entry ?’ "." st)
+    (modify-syntax-entry ?- "." st)
     st)
   "Syntax table used when deciding whether to capitalize a word.")
 
@@ -232,12 +233,13 @@ Alternatively, if the word is \"I.e.\", then it is downcased by calling
       (cond
        ((and auto-capitalize--fixed-case-regexp
              (let ((case-fold-search nil))
-               (goto-char word-start)
-               (and (looking-at auto-capitalize--fixed-case-regexp)
-                    (let ((after (match-end 0)))
-                      (or (>= after (point-max))
-                          (not (eq (char-syntax (char-after after)) ?w))
-                          (memq (char-after after) '(?’ ?')))))))
+               (with-syntax-table auto-capitalize--syntax-table
+                 (goto-char word-start)
+                 (and (looking-at auto-capitalize--fixed-case-regexp)
+                      (let ((after (match-end 0)))
+                        (or (>= after (point-max))
+                            (not (eq (char-syntax (char-after after)) ?w))
+                            (memq (char-after after) auto-capitalize-trigger-chars)))))))
 
         (auto-capitalize--handle-fixed-case (match-beginning 0) (match-end 0)))
 
@@ -275,12 +277,12 @@ If BUFFER-LOCAL is non-nil, only sets the buffer-local value."
         (set-local sym val)
         (setq-local auto-capitalize--fixed-case-regexp
                     (if val
-                        (regexp-opt (mapcar #'downcase val))
+                        (regexp-opt (mapcar #'downcase val) 'symbols)
                       nil)))
     (set-default sym val)
     (setq auto-capitalize--fixed-case-regexp
           (if val
-              (regexp-opt (mapcar #'downcase val))
+              (regexp-opt (mapcar #'downcase val) 'symbols)
             nil))))
 
 (defun auto-capitalize--set-abbrevs (sym val &optional buffer-local)
@@ -524,11 +526,13 @@ gated by the corresponding user options.
          ;; Block capitalization after any word in `auto-capitalize-abbrevs',
          ;; unless the current word is one in `auto-capitalize-fixed-case-words'
 
-         (and (not (looking-at auto-capitalize--fixed-case-regexp))
-              (re-search-backward
-               auto-capitalize--abbrevs-regexp
-               (line-beginning-position) t)
-              (= (1+ (match-end 0)) word-start))))
+         (with-syntax-table auto-capitalize--syntax-table
+           (and
+            (not (looking-at auto-capitalize--fixed-case-regexp))
+            (re-search-backward
+             auto-capitalize--abbrevs-regexp
+             (line-beginning-position) t)
+            (= (1+ (match-end 0)) word-start)))))
 
       ;; Only capitalize after typing or yanking text, but only after
       ;; `auto-capitalize-trigger-chars'
@@ -536,7 +540,6 @@ gated by the corresponding user options.
            (memq this-command `(self-insert-command
                                 ,(command-remapping 'self-insert-command)))
            (not (memq last-command-event auto-capitalize-trigger-chars)))))
-
 
 (defun auto-capitalize-default-trigger-function (text-start word-start)
   "Check whether to capitalize the word at WORD-START.
@@ -631,7 +634,6 @@ non-nil."
                         (goto-char string-start)
                         (skip-syntax-forward "^w")
                         (point))))))))))
-
 
 (defun auto-capitalize-after-change (beg end length)
   "If `auto-capitalize-mode' is enabled, then start the capitalization logic.
