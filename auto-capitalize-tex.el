@@ -82,10 +82,12 @@ This predicate is added to `auto-capitalize-blocking-functions' when
 `auto-capitalize-tex-mode' is enabled."
   (and (bound-and-true-p TeX-mode-p)
        (save-excursion
-         (or (progn
-               (goto-char word-start)
-               (TeX-escaped-p))
-             (texmathp)))))
+         (goto-char word-start)
+         (or
+          (TeX-escaped-p)               ; Macros themselves should never be
+                                        ; capitalized
+          (texmathp)
+          (equal (TeX-current-macro) "documentclass")))))
 
 (defun auto-capitalize-tex-trigger-function (_text-start word-start)
   "Return non-nil if capitalization should occur at WORD-START.
