@@ -245,7 +245,7 @@ Alternatively, if the word is \"I.e.\", then it is downcased by calling
        ((progn
           (goto-char word-start)
           (skip-chars-backward "[[:alpha:]].")
-          (looking-at "I.e."))
+          (looking-at "I\\.e\\." t))
 
         (auto-capitalize--downcase-ie (point) (+ (point) 4)))
 
@@ -785,7 +785,6 @@ Interactively, uses completion to select an existing word."
                                                    words)
                                    buffer-local)
   (message "%s" auto-capitalize-fixed-case-words))
-
 
 ;;;###autoload
 (define-minor-mode auto-capitalize-mode
