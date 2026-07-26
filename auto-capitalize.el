@@ -254,7 +254,8 @@ Alternatively, if the word is \"I.e.\", then it is downcased by calling
        ((progn
           (goto-char word-start)
           (skip-chars-backward "[[:alpha:]].")
-          (looking-at "I\\.e\\." t))
+          (let ((case-fold-search nil))
+            (looking-at "I\\.e\\." t)))
 
         (auto-capitalize--downcase-ie (point) (+ (point) 4)))
 
