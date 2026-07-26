@@ -89,8 +89,7 @@ preceded with a ~not~) the global mode. By default, this contains ~comint-mode~.
 
 ~auto-capitalize-fixed-case-words~ is a list of words whose case will always be exactly how
 it appears in the list. For example, the English pronoun "I" - the only default entry -
-will replace any lowercase "i" followed by any character in ~auto-capitalize-trigger-chars~.
-You can, of course, customize ~auto-capitalize-trigger-chars~ as well!
+will replace any lowercase "i" followed by any character with non-word syntax.
 
 Outside of ~auto-capitalize-fixed-case-words~, which are always forced to be in whatever
 case you specify, no capitalization takes place if the word of interest happens to be

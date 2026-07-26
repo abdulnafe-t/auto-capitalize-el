@@ -60,17 +60,17 @@
    (should (equal (buffer-substring-no-properties (point-min) (point-max)) "A "))))
 
 (ert-deftest auto-capitalize-text-triggers ()
-  "Capitalize the previous word after `auto-capitalize-trigger-chars'."
+  "Capitalize the previous word after non-word chars."
   (auto-capitalize-tests--setup
-    text-mode
-    (electric-quote-local-mode -1)
-    (dolist (trigger auto-capitalize-trigger-chars)
-      (erase-buffer)
-      (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
-      (ert-simulate-command '(self-insert-command 1 ?a))
-      (ert-simulate-command `(self-insert-command 1 ,trigger))
-      (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                     (concat "\nA" (char-to-string trigger)))))))
+   text-mode
+   (electric-quote-local-mode -1)
+   (dolist (trigger '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?- ?! ?\n))
+     (erase-buffer)
+     (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
+     (ert-simulate-command '(self-insert-command 1 ?a))
+     (ert-simulate-command `(self-insert-command 1 ,trigger))
+     (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                    (concat "\nA" (char-to-string trigger)))))))
 
 (ert-deftest auto-capitalize-text-yank ()
   "Capitalize yanked text."
@@ -138,12 +138,11 @@
 
 (ert-deftest auto-capitalize-text-fixed-case-after-abbreviations ()
   "Capitalize words in `auto-capitalize-fixed-case-words' after words in
-`auto-capitalize-abbrevs' with all members of
-`auto-capitalize-trigger-chars'."
+`auto-capitalize-abbrevs' with a selection of non-word chars."
   (auto-capitalize-tests--setup
    text-mode
    (dolist (abbrev auto-capitalize-abbrevs)
-     (dolist (trigger auto-capitalize-trigger-chars)
+     (dolist (trigger '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?- ?! ?\n))
        (erase-buffer)
        (insert abbrev ?\s)
        (ert-simulate-command '(self-insert-command 1 ?i))
@@ -193,8 +192,8 @@ even if they appear inside quotes."
                   (concat "\tA " )))))
 
 (ert-deftest auto-capitalize-text-fixed-case-with-triggers ()
-  "Capitalize words in `auto-capitalize-fixed-case-words' after all members
-of `auto-capitalize-trigger-chars'."
+  "Capitalize words in `auto-capitalize-fixed-case-words' after non-word
+chars."
   (let ((cached auto-capitalize-fixed-case-words))
     (unwind-protect
         (auto-capitalize-tests--setup
@@ -205,7 +204,7 @@ of `auto-capitalize-trigger-chars'."
          (insert "a")
          (ert-simulate-command '(self-insert-command 1 ?\s))
 
-         (dolist (trigger auto-capitalize-trigger-chars)
+         (dolist (trigger '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?- ?! ?\n))
            (ert-simulate-command '(self-insert-command 1 ?i))
            (ert-simulate-command `(self-insert-command 1 ,trigger))
 

@@ -127,7 +127,6 @@ the regexp on every keystroke, and by
 (defvar auto-capitalize-outline-headings)
 (defvar auto-capitalize-fixed-case-words)
 (defvar auto-capitalize-abbrevs)
-(defvar auto-capitalize-trigger-chars)
 (defvar auto-capitalize-trigger-functions)
 (defvar auto-capitalize-blocking-functions)
 (defvar auto-capitalize-downcase-ie)
@@ -227,8 +226,7 @@ Alternatively, if the word is \"I.e.\", then it is downcased by calling
                  (and (looking-at auto-capitalize--fixed-case-regexp)
                       (let ((after (match-end 0)))
                         (or (>= after (point-max))
-                            (not (eq (char-syntax (char-after after)) ?w))
-                            (memq (char-after after) auto-capitalize-trigger-chars)))))))
+                            (not (eq (char-syntax (char-after after)) ?w))))))))
 
         (auto-capitalize--handle-fixed-case (match-beginning 0) (match-end 0)))
 
@@ -412,25 +410,12 @@ Changing it with `setq' or `add-to-list' will not work correctly."
   "If non-nil, \"i.e.\" will always be downcased.
 
 This is intended as a fix for the unfortunate side effect of the
-combination of `auto-capitalize-fixed-case-words' containing \"I\",
-`auto-capitalize-trigger-chars' containing \".\", and
+combination of `auto-capitalize-fixed-case-words' containing \"I\", and
 `auto-capitalize-abbrevs' containing \"i.e.\", leading to the latter
 getting capitalized when it shouldn't."
 
   :group 'auto-capitalize
   :type 'boolean)
-
-(defcustom auto-capitalize-trigger-chars '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?- ?! ?\n)
-  "List of chars that trigger auto-capitalization on the preceding word.
-
-This variable is checked by `auto-capitalize-default-blocking-function'.
-
-If this variable is nil, it is ignored."
-  :group 'auto-capitalize
-  :type
-  '(choice (repeat (character
-                    :tag "Characters that trigger capitalization on the preceding word"))
-           (const nil)))
 
 (defcustom auto-capitalize-blocking-functions
   (list #'auto-capitalize-default-blocking-function)
@@ -489,8 +474,7 @@ gated by the corresponding user options.
 
 4) if the word preceding WORD-START is in `auto-capitalize-abbrevs'
 
-5) the last typed character was not one of
-`auto-capitalize-trigger-chars'."
+5) the last typed character has word syntax."
 
   (or buffer-read-only
       (minibufferp)
@@ -523,12 +507,14 @@ gated by the corresponding user options.
              (line-beginning-position) t)
             (= (1+ (match-end 0)) word-start)))))
 
-      ;; Only capitalize after typing or yanking text, but only after
-      ;; `auto-capitalize-trigger-chars'
-      (and auto-capitalize-trigger-chars
-           (memq this-command `(self-insert-command
-                                ,(command-remapping 'self-insert-command)))
-           (not (memq last-command-event auto-capitalize-trigger-chars)))))
+      ;; Block capitalization if inserting chars with word-syntax. This ensures
+      ;; that capitalization only triggers once a non-word char is inserted.
+      (and
+       (memq this-command `(self-insert-command
+                            ,(command-remapping 'self-insert-command)))
+
+       (with-syntax-table auto-capitalize--syntax-table
+         (eq (char-syntax last-command-event) ?w)))))
 
 (defun auto-capitalize-default-trigger-function (text-start word-start)
   "Check whether to capitalize the word at WORD-START.
@@ -682,13 +668,16 @@ word before point (or the yanked text) should be capitalized."
                                                   (match-end 0)
                                                   0))))))
 
-           ;; Self-inserting trigger character.
+           ;; Self-inserting a non-word character.
            ((and (= length 0)
-                 (> (- end beg) 0)
-                 (memq (char-before end) auto-capitalize-trigger-chars))
+                 (> end beg)
+
+                 (with-syntax-table auto-capitalize--syntax-table
+                   (not (eq (char-syntax (char-before end)) ?w))))
 
             (and (> beg (point-min))
-                 (eq (char-syntax (char-before beg)) ?w)
+                 (with-syntax-table auto-capitalize--syntax-table
+                   (eq (char-syntax (char-before beg)) ?w))
                  (auto-capitalize--maybe-capitalize
                   text-start word-start))))))
     (error (message "auto-capitalize error: %S" error) nil)))
