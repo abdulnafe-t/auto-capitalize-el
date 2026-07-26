@@ -39,6 +39,8 @@
               :selected t)
      (,mode)
      (auto-capitalize-mode 1)
+     (electric-quote-local-mode -1)
+     (electric-pair-local-mode -1)
      (when (and (derived-mode-p 'TeX-mode)
                 (fboundp 'auto-capitalize-tex-mode))
        (auto-capitalize-tex-mode 1))
@@ -63,7 +65,6 @@
   "Capitalize the previous word after non-word chars."
   (auto-capitalize-tests--setup
    text-mode
-   (electric-quote-local-mode -1)
    (dolist (trigger '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?- ?! ?\n))
      (erase-buffer)
      (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
@@ -199,7 +200,6 @@ chars."
         (auto-capitalize-tests--setup
          text-mode
          (setopt auto-capitalize-fixed-case-words '("I"))
-         (electric-quote-local-mode -1)
          (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
          (insert "a")
          (ert-simulate-command '(self-insert-command 1 ?\s))
@@ -294,8 +294,6 @@ chars."
   (skip-unless (featurep 'auctex))
   (auto-capitalize-tests--setup
    TeX-mode
-   (when (fboundp #'electric-pair-mode)
-     (electric-pair-local-mode -1))
    (ert-simulate-command '(self-insert-command 1 ?$))
    (ert-simulate-command '(self-insert-command 1 ?a))
    (ert-simulate-command '(self-insert-command 1 ?\s))
