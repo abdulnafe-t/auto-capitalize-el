@@ -135,17 +135,6 @@ the regexp on every keystroke, and by
 
 ;; Internal functions
 
-(defun auto-capitalize--inserted-trigger-char (beg end length)
-  "Return non-nil if the inserted text ends with a trigger character.
-
-BEG, END, and LENGTH are the position in the buffer where the change
-started, where it ended, and the length of that section before the
-change, respectively, as defined by the documentation of
-`after-change-functions' (which see)."
-  (and (= length 0)
-       (> (- end beg) 0)
-       (memq (char-before end) auto-capitalize-trigger-chars)))
-
 (defun auto-capitalize--downcase-ie (abbrev-start abbrev-end)
   "Downcase the abbreviation \"i.e.\" between ABBREV-START and ABBREV-END.
 
@@ -434,8 +423,7 @@ getting capitalized when it shouldn't."
 (defcustom auto-capitalize-trigger-chars '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?- ?! ?\n)
   "List of chars that trigger auto-capitalization on the preceding word.
 
-This variable is checked by `auto-capitalize-default-blocking-function'
-and `auto-capitalize--inserted-trigger-char'.
+This variable is checked by `auto-capitalize-default-blocking-function'.
 
 If this variable is nil, it is ignored."
   :group 'auto-capitalize
@@ -695,7 +683,10 @@ word before point (or the yanked text) should be capitalized."
                                                   0))))))
 
            ;; Self-inserting trigger character.
-           ((auto-capitalize--inserted-trigger-char beg end length)
+           ((and (= length 0)
+                 (> (- end beg) 0)
+                 (memq (char-before end) auto-capitalize-trigger-chars))
+
             (and (> beg (point-min))
                  (eq (char-syntax (char-before beg)) ?w)
                  (auto-capitalize--maybe-capitalize
