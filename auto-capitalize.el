@@ -107,6 +107,13 @@ the regexp on every keystroke, and by
 (defvar auto-capitalize--lighter " AutoCap"
   "Mode-line lighter for `auto-capitalize-mode'.")
 
+(defvar auto-capitalize--syntax-table
+  (let ((st (make-syntax-table)))
+    (modify-syntax-entry ?' "_" st)
+    (modify-syntax-entry ?’ "_" st)
+    st)
+  "Syntax table used when deciding whether to capitalize a word.")
+
 
 ;; Forward declarations to satisfy the compiler
 
