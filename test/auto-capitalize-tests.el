@@ -136,6 +136,21 @@
      (should (equal (buffer-substring-no-properties (point-min) (point-max))
                     (concat abbrev " a " ))))))
 
+(ert-deftest auto-capitalize-text-fixed-case-after-abbreviations ()
+  "Capitalize words in `auto-capitalize-fixed-case-words' after words in
+`auto-capitalize-abbrevs' with all members of
+`auto-capitalize-trigger-chars'."
+  (auto-capitalize-tests--setup
+   text-mode
+   (dolist (abbrev auto-capitalize-abbrevs)
+     (dolist (trigger auto-capitalize-trigger-chars)
+       (erase-buffer)
+       (insert abbrev ?\s)
+       (ert-simulate-command '(self-insert-command 1 ?i))
+       (ert-simulate-command `(self-insert-command 1 ,trigger))
+       (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                      (concat abbrev " I" (char-to-string trigger))))))))
+
 (ert-deftest auto-capitalize-text-after-quoted-abbreviations ()
   "Don’t capitalize after words in `auto-capitalize-abbrevs',
 even if they appear inside quotes."
