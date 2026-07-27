@@ -15,7 +15,7 @@
 ;; Created: 20 May 1998
 ;; Package-Version: 3.0
 ;; Keywords: text, wp, convenience
-;; URL: https://github.com/abdulnafe-t/auto-capitalize-el
+;; URL: https://github.com/abdulnafe-t/auto-capitalize.el
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
