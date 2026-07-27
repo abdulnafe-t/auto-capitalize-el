@@ -105,7 +105,7 @@ Note that the lists ~auto-capitalize-abbrevs~ and ~auto-capitalize-fixed-case-wo
 set with either ~setopt~, the ~customize~ interface, or the corresponding functions
 ~auto-capitalize-add-abbrevs~, ~auto-capitalize-add-fixed-case-words~,
 ~auto-capitalize-remove-abbrevs~, and ~auto-capitalize-remove-fixed-case-words~, otherwise
-your changes will not take effect. In specific, it is not enough to just use ~add-to-list~
+your changes will not take effect. Specifically, it is not enough to just use ~add-to-list~
 to add elements to either of these variables.
 
 Finally, for finer control, there is the core of the capitalization logic. The package
