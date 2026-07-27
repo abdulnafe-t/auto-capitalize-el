@@ -37,6 +37,21 @@
 ;; comments or strings in any `prog-mode' buffer, or indeed any buffer where
 ;; comments are defined by the major mode (Org, TeX,...).
 ;;
+;; A basic configuration using `use-package' might look like
+;;
+;;     (use-package auto-capitalize
+;;       :init
+;;       (auto-capitalize-global-mode))
+;;
+;; Or, to also use the Org and TeX plugins (the latter requiring AUCTeX):
+;;
+;;     (use-package auto-capitalize
+;;       :init
+;;       (auto-capitalize-global-mode)
+;;       :hook
+;;       ((TeX-mode-hook . auto-capitalize-tex-mode)
+;;        (org-mode-hook . auto-capitalize-org-mode)))
+;;
 ;; The heart of the package is `auto-capitalize-after-change', which is installed
 ;; in `after-change-functions' when the mode is enabled. It serves as the main
 ;; entry point for the capitalization logic, which is based on two hooks that
