@@ -634,6 +634,41 @@ docstrings."
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
                   "(defun test-func ()\n\"A a \""))))
 
+(ert-deftest auto-capitalize-prog-fixed-case ()
+  "Capitalize words in `auto-capitalize-fixed-case-words'."
+  (let ((cached auto-capitalize-fixed-case-words))
+    (unwind-protect
+        (auto-capitalize-tests--setup
+         emacs-lisp-mode
+         (let ((auto-capitalize-comments t))
+           (setopt auto-capitalize-fixed-case-words '("eMaCs"))
+           (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
+           (ert-simulate-command '(comment-dwim 2))
+           (insert "emacs")
+           (ert-simulate-command `(self-insert-command 1 ?\s))
+           (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                          "\n;; eMaCs ")))
+         (erase-buffer)
+         (let ((auto-capitalize-strings t))
+           (setopt auto-capitalize-fixed-case-words '("eMaCs"))
+           (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
+           (insert "\"\"")
+           (backward-char)
+           (insert "emacs")
+           (ert-simulate-command `(self-insert-command 1 ?\s))
+           (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                          "\n\"eMaCs \"")))
+         (erase-buffer)
+         (let ((auto-capitalize-strings t))
+           (setopt auto-capitalize-fixed-case-words '("eMaCs" "Emacsen"))
+           (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
+           (insert "\"\"")
+           (backward-char)
+           (insert "emacsen")
+           (ert-simulate-command `(self-insert-command 1 ?\s))
+           (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                          "\n\"Emacsen \""))))
+      (setopt auto-capitalize-fixed-case-words cached))))
 
 (ert-deftest auto-capitalize-python-def-docstring ()
   "Capitalize the first word (and no other words) in `python-mode' function
@@ -743,42 +778,6 @@ for both inline comments and newline-based (BOL) comments."
      (ert-simulate-command '(self-insert-command 1 ?\s))
      (should (equal (buffer-substring-no-properties (point-min) (point-max))
                     ";; A ")))))
-
-(ert-deftest auto-capitalize-text-fixed-case ()
-  "Capitalize words in `auto-capitalize-fixed-case-words'."
-  (let ((cached auto-capitalize-fixed-case-words))
-    (unwind-protect
-        (auto-capitalize-tests--setup
-         emacs-lisp-mode
-         (let ((auto-capitalize-comments t))
-           (setopt auto-capitalize-fixed-case-words '("eMaCs"))
-           (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
-           (ert-simulate-command '(comment-dwim 2))
-           (insert "emacs")
-           (ert-simulate-command `(self-insert-command 1 ?\s))
-           (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                          "\n;; eMaCs ")))
-         (erase-buffer)
-         (let ((auto-capitalize-strings t))
-           (setopt auto-capitalize-fixed-case-words '("eMaCs"))
-           (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
-           (insert "\"\"")
-           (backward-char)
-           (insert "emacs")
-           (ert-simulate-command `(self-insert-command 1 ?\s))
-           (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                          "\n\"eMaCs \"")))
-         (erase-buffer)
-         (let ((auto-capitalize-strings t))
-           (setopt auto-capitalize-fixed-case-words '("eMaCs" "Emacsen"))
-           (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
-           (insert "\"\"")
-           (backward-char)
-           (insert "emacsen")
-           (ert-simulate-command `(self-insert-command 1 ?\s))
-           (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                          "\n\"Emacsen \""))))
-      (setopt auto-capitalize-fixed-case-words cached))))
 
 
 ;;;; Tests for `nxml-mode'
