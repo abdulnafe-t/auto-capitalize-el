@@ -77,6 +77,7 @@
 ;;; Code:
 
 (require 'cl-lib)     ; cl-find
+(require 'seq)        ; seq-difference
 (require 'regexp-opt) ; regexp-opt
 (require 'compat)     ; when-let*, set-local
 
