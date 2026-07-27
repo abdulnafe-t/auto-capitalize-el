@@ -286,17 +286,16 @@ If BUFFER-LOCAL is non-nil, only sets the buffer-local value."
         (set-local sym val)
         (setq-local auto-capitalize--abbrevs-regexp
                     (if val
+
                         ;; HACK: the extra groups around the abbrevs are here to
                         ;; make sure we can handle edge cases, like if the
                         ;; abbreviation is quoted, or if it appears as a
                         ;; substring of the previous word (for instance, if the
-                        ;; previous word is "abbrevs.")
-                        ;;
+                        ;; previous word is "abbrevs.").
+
                         (concat "\\<"
                                 (regexp-opt auto-capitalize-abbrevs)
                                 "[^.[:space:]]*")
-
-
                       nil)))
     (set-default sym val)
     (setq auto-capitalize--abbrevs-regexp
