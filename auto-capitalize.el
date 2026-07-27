@@ -53,8 +53,8 @@
 ;; predicates buffer-locally.
 ;;
 ;; The second hook is `auto-capitalize-trigger-functions'. These functions are
-;; called with the starting positions of both the current text and the current
-;; word, and if any of them returns non-nil, capitalization occurs.
+;; called with the same arguments as the blocking functions, and if any of them
+;; returns non-nil, capitalization occurs.
 ;;
 ;; Note that the blocking functions take precedence: they are called first, and
 ;; only if they all return nil, the trigger functions get called.
