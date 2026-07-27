@@ -1,4 +1,4 @@
-;;; auto-capitalize.el --- Automatically capitalize words -*- lexical-binding: t; -*-
+;;; auto-capitalize.el --- Automatic capitalization with batteries included -*- lexical-binding: t; -*-
 
 ;; Copyright   1998,2001,2002,2005 Kevin Rodgers
 ;; Copyright   2026 Abdulnafé Toulaïmat

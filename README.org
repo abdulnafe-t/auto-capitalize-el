@@ -2,7 +2,7 @@
 #+author: Abdulnafé Toulaïmat
 #+language: en_US
 
-Automatically capitalize text as you type.
+Automatic capitalization with batteries included.
 
 * Installation
 
