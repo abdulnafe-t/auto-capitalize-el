@@ -821,7 +821,7 @@ This will install `auto-capitalize-after-change' in
 ;;;###autoload
 (define-globalized-minor-mode auto-capitalize-global-mode
   auto-capitalize-mode auto-capitalize-mode
-  :predicate '(not comint-mode))
+  :predicate '(not comint-mode conf-mode))
 
 
 (provide 'auto-capitalize)
