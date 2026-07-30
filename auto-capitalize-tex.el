@@ -37,7 +37,6 @@
 (declare-function texmathp "ext:texmathp")
 (declare-function TeX-current-macro "ext:tex")
 (declare-function TeX-escaped-p "ext:tex")
-(declare-function TeX-mode-p "ext:tex")
 (declare-function TeX-find-macro-start "ext:tex")
 
 (defgroup auto-capitalize-tex nil
