@@ -85,7 +85,7 @@ More explanations are in each variable’s respective doc string.
 
 The mode is defined by ~define-globalized-minor-mode~, which means you get access to
 ~auto-capitalize-global-modes~, which is a list of modes in which to enable (or disable if
-preceded with a ~not~) the global mode. By default, this contains ~comint-mode~ and ~conf-mode~.
+preceded with a ~not~) the global mode. By default, this contains ~text-mode~ and ~prog-mode~.
 
 ~auto-capitalize-fixed-case-words~ is a list of words whose case will always be exactly how
 it appears in the list. For example, the English pronoun "I" - the only default entry -
