@@ -533,8 +533,8 @@ gated by the corresponding user options.
       ;; Block capitalization if inserting chars with word-syntax. This ensures
       ;; that capitalization only triggers once a non-word char is inserted.
       (and
-       ;; We check for nil this-command explicitly, since the memq test below
-       ;; would pass if command-remapping is nil:
+       ;; We explicitly check for this-command being nil, otherwise the memq
+       ;; test below would pass if command-remapping returns nil:
        ;; (memq nil '(self-insert-command nil)) => t
        this-command
        (memq this-command `(self-insert-command
