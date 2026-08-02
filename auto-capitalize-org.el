@@ -99,12 +99,12 @@ org comments do not play nice with `bounds-of-thing-at-point' or
          (org-at-comment-p)
          (= word-start
             (save-excursion
-              (goto-char (line-beginning-position))
+              (beginning-of-line)
               (skip-syntax-forward "^w")
               (point))))
 
         (save-excursion
-          (goto-char (line-beginning-position))
+          (beginning-of-line)
           (when (and (bound-and-true-p outline-regexp)
                      (looking-at outline-regexp))
             (goto-char (match-end 0))
@@ -122,7 +122,7 @@ org comments do not play nice with `bounds-of-thing-at-point' or
          (org-at-item-p)
          (= word-start
             (save-excursion
-              (goto-char (line-beginning-position))
+              (beginning-of-line)
               (looking-at org-list-full-item-re)
               (goto-char
                (if (and (match-beginning 4)

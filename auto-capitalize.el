@@ -582,7 +582,7 @@ non-nil."
               (and auto-capitalize-outline-headings
                    (bound-and-true-p outline-regexp)
                    (save-excursion
-                     (goto-char (line-beginning-position))
+                     (beginning-of-line)
                      (when (looking-at outline-regexp)
                        (goto-char (match-end 0))
                        (skip-syntax-forward "^w" (line-end-position))
