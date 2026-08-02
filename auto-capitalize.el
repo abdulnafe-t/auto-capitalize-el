@@ -817,7 +817,7 @@ This will install `auto-capitalize-after-change' in
   (cond
    ;; Turn off
    ((not auto-capitalize-mode)
-    (remove-hook 'after-change-functions 'auto-capitalize-after-change t))
+    (remove-hook 'after-change-functions #'auto-capitalize-after-change t))
 
    ;; Turn on
    (t
