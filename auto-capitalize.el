@@ -533,7 +533,7 @@ gated by the corresponding user options.
       ;; Block capitalization if inserting chars with word-syntax. This ensures
       ;; that capitalization only triggers once a non-word char is inserted.
       (and
-       ;; We explicitly check for this-command being nil, otherwise the memq
+       ;; We explicitly check for `this-command' being nil, otherwise the `memq'
        ;; test below would pass if command-remapping returns nil:
        ;; (memq nil '(self-insert-command nil)) => t
        this-command
@@ -699,7 +699,6 @@ word before point (or the yanked text) should be capitalized."
            ;; Self-inserting a non-word character.
            ((and (= length 0)
                  (> end beg)
-
                  (with-syntax-table auto-capitalize--syntax-table
                    (not (eq (char-syntax (char-before end)) ?w))))
 
@@ -808,8 +807,8 @@ Interactively, uses completion to select an existing word."
 (define-minor-mode auto-capitalize-mode
   "Toggle `auto-capitalize' minor mode in the current buffer.
 
-This will install `auto-capitalize-after-change' in
-`after-change-functions' in the current buffer."
+This will install `auto-capitalize-after-change' in the current buffer's
+ `after-change-functions'."
 
   :init-value nil
   :lighter auto-capitalize--lighter
