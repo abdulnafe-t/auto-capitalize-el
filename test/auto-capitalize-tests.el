@@ -801,5 +801,18 @@ for both inline comments and newline-based (BOL) comments."
      (should (equal (buffer-substring-no-properties (point-min) (point-max))
                     "<!--- a  --->")))))
 
+;;;; Misc.
+
+(ert-deftest auto-capitalize-global-modes-test ()
+  "Don't activate `auto-capitalize-mode' in any major mode excluded in `auto-capitalize-global-modes'."
+  (auto-capitalize-global-mode)
+  (ert-with-test-buffer
+      (:name "*Auto-capitalize-test-buffer*"
+             :selected t)
+    (dolist (mode (cdar auto-capitalize-global-modes))
+      (when (fboundp mode)
+        (funcall mode)
+        (should-not auto-capitalize-mode)))))
+
 (provide 'auto-capitalize-tests)
 ;;; auto-capitalize-tests.el ends here
