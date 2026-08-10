@@ -7,6 +7,7 @@
 ;; (Please don’t contact original author if you found a bug in this
 ;; package)
 ;; Past maintainer: Yuta Yamada <cokesboy at gmail.com>
+
 ;; Maintainer: Abdulnafé Toulaïmat <abdulnafe.toulaimat@gmail.com>
 ;; Assisted-by: OpenCode:Big_Pickle
 ;; Package-Requires: ((emacs "25.1")
@@ -34,8 +35,8 @@
 
 ;; `auto-capitalize-mode' is a minor mode that automatically capitalizes text as
 ;; you type. It does this at the start of sentences/paragraphs, as well as in
-;; comments or strings in any `prog-mode' buffer, or indeed any buffer where
-;; comments are defined by the major mode (Org, TeX,...).
+;; comments or strings in any `prog-mode' buffer, or indeed any buffer whose
+;; major mode defines some syntax for comments (Org, TeX,...).
 ;;
 ;; A basic configuration using `use-package' might look like
 ;;
@@ -52,15 +53,17 @@
 ;;       ((TeX-mode-hook . auto-capitalize-tex-mode)
 ;;        (org-mode-hook . auto-capitalize-org-mode)))
 ;;
-;; The heart of the package is `auto-capitalize-after-change', which is installed
-;; in `after-change-functions' when the mode is enabled. It serves as the main
-;; entry point for the capitalization logic, which is based on two hooks that
-;; you can add your own predicates to. The `auto-capitalize-blocking-functions'
-;; hook gives you the right of first refusal over capitalization: each function
-;; in that hook is called with two arguments (TEXT-START WORD-START) and returns
-;; non-nil to block capitalization. If any function returns non-nil, the check
-;; fails and no word is capitalized. Note, however, that even if every function
-;; in this hook returns nil, that does not guarantee a word will be capitalized.
+;; The heart of the package is `auto-capitalize-after-change', which is
+;; installed in `after-change-functions' when the mode is enabled. It serves as
+;; the main entry point for the capitalization logic, which is based on two
+;; hooks that you can add your own predicates to. The
+;; `auto-capitalize-blocking-functions' hook gives you the right of first
+;; refusal over capitalization: each function in that hook is called with two
+;; arguments, TEXT-START and WORD-START, and returns non-nil to block
+;; Capitalization of the word at WORD-START. A single function in that hook
+;; returning non-nil causes the check fails and blocks capitalization. Note,
+;; however, that even if every function in this hook returns nil, that does not
+;; guarantee a word will be capitalized.
 ;;
 ;; By default, this hook only contains
 ;; `auto-capitalize-default-blocking-function'. Additional plugins, like the
@@ -69,12 +72,13 @@
 ;;
 ;; The second hook is `auto-capitalize-trigger-functions'. These functions are
 ;; called with the same arguments as the blocking functions, and if any of them
-;; returns non-nil, capitalization occurs.
+;; returns non-nil, capitalization occurs. By default, only
+;; `auto-capitalize-default-trigger-function' is included in this hook.
 ;;
 ;; Note that the blocking functions take precedence: they are called first, and
 ;; only if they all return nil, the trigger functions get called.
 ;;
-;; Alternatively, if you do not want to write a whole new predicate, you can
+;; Alternatively, if you don't want to write a whole new predicate, you can
 ;; always customize some of the user options in the `auto-capitalize' group.
 ;; Examples include `auto-capitalize-strings', which controls whether strings in
 ;; prog-mode should be auto-capitalized, and its comment analogue
