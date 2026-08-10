@@ -277,17 +277,18 @@ chars."
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
                   "\\section{}\nA "))))
 
+
+;;;; Tests for `TeX-mode'
+
 (ert-deftest auto-capitalize-tex-ignore-braceless-macro ()
   "Do not capitalize TeX macros."
+  (skip-unless (featurep 'auctex))
   (auto-capitalize-tests--setup
    tex-mode
    (insert "\\bigskip")
    (ert-simulate-command '(self-insert-command 1 ?\s))
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
                   "\\bigskip "))))
-
-
-;;;; Tests for `TeX-mode'
 
 (ert-deftest auto-capitalize-TeX-math-dollar ()
   "Do not capitalize anything in `TeX-mode' $$ blocks."
