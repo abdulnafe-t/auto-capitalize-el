@@ -5,13 +5,6 @@
 ;; Author: Abdulnafé Toulaïmat <abdulnafe.toulaimat@gmail.com>
 ;; Assisted-by: OpenCode:Big_Pickle
 
-;; Package-Requires: ((emacs "25.1")
-;;                    (auto-capitalize "3.0")
-;;                    (compat "31.0"))
-;; Package-Version: 3.0
-;; Keywords: text, convenience
-;; URL: https://github.com/abdulnafe-t/auto-capitalize-el
-
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
