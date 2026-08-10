@@ -824,7 +824,50 @@ This will install `auto-capitalize-after-change' in the current buffer's
 ;;;###autoload
 (define-globalized-minor-mode auto-capitalize-global-mode
   auto-capitalize-mode auto-capitalize-mode
-  :predicate '(text-mode prog-mode))
+  :predicate '(;; We exclude a number of modes derived from `text-mode' (and
+               ;; some from `prog-mode'), because we know that auto-cap would
+               ;; make too many mistakes in such modes. These are either modes
+               ;; with syntax that auto-cap can't handle on its own, requiring a
+               ;; plugin, or modes aimed at data serialization where "strings"
+               ;; are really keys that shouldn't be capitalized.
+               ;;
+               ;; There's also a couple of misc. modes, such as `bib-mode.'
+               ;; Unsure how to handle those. Exclude them by default.
+               ;;
+               ;; This is meant to be defensive: we only enable auto-cap where
+               ;; we know it can work. Any plugin that teaches auto-cap about
+               ;; these modes will need to activate `auto-capitalize-mode'
+               ;; itself.
+
+               (not TeX-mode  ; (AUCTeX) Unsupported without
+                              ; `auto-capitalize-tex-mode'
+                    tex-mode  ; (Builtin) Unsupported.
+
+                    ;; TODO: we should add plugins to support these.
+                    texinfo-mode
+                    html-mode
+                    nxml-mode
+                    sgml-mode
+                    heex-ts-mode
+                    php-ts-mode
+
+                    ;; Technically text-modes, but capitalization
+                    ;; doesn't make much sense. Likely to stay excluded.
+                    css-base-mode
+                    nroff-mode
+                    conf-mode
+                    toml-mode
+                    toml-ts-mode
+                    yaml-mode
+                    yaml-ts-mode
+                    json-mode ; Also excludes `json-ts-mode'
+
+                    ;; FIXME: is it really necessary to exclude these?
+                    bib-mode
+                    icalendar-mode)
+
+               ;; NOTE: the excluded modes should come before the included ones.
+               text-mode prog-mode))
 
 
 (provide 'auto-capitalize)
