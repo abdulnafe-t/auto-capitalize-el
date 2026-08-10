@@ -127,7 +127,6 @@ the regexp on every keystroke, and by
   (let ((st (make-syntax-table)))
     (modify-syntax-entry ?' "." st)
     (modify-syntax-entry ?’ "." st)
-    (modify-syntax-entry ?- "." st)
     st)
   "Syntax table used when deciding whether to capitalize a word.")
 

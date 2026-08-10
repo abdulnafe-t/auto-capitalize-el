@@ -143,7 +143,7 @@
   (auto-capitalize-tests--setup
    text-mode
    (dolist (abbrev auto-capitalize-abbrevs)
-     (dolist (trigger '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?- ?! ?\n))
+     (dolist (trigger '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?! ?\n))
        (erase-buffer)
        (insert abbrev ?\s)
        (ert-simulate-command '(self-insert-command 1 ?i))
@@ -204,7 +204,7 @@ chars."
          (insert "a")
          (ert-simulate-command '(self-insert-command 1 ?\s))
 
-         (dolist (trigger '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?- ?! ?\n))
+         (dolist (trigger '(?\s ?, ?. ?? ?' ?’ ?: ?\; ?! ?\n))
            (ert-simulate-command '(self-insert-command 1 ?i))
            (ert-simulate-command `(self-insert-command 1 ,trigger))
 
