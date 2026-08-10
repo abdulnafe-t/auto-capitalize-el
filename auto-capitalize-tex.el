@@ -5,14 +5,6 @@
 ;; Author: Abdulnafé Toulaïmat <abdulnafe.toulaimat@gmail.com>
 ;; Assisted-by: OpenCode:Big_Pickle
 
-;; Package-Requires: ((emacs "25.1")
-;;                    (auto-capitalize "3.0")
-;;                    (auctex "11.82")
-;;                    (compat "31.0"))
-;; Package-Version: 3.0
-;; Keywords: tex, wp, convenience
-;; URL: https://github.com/abdulnafe-t/auto-capitalize-el
-
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -147,13 +139,19 @@ will be enabled automatically."
                  auto-capitalize--lighter)))
 
    (t
+    (unless (featurep 'auctex)
+      (auto-capitalize-tex-mode -1)
+      (user-error "Auto-capitalize-tex-mode requires AUCTeX"))
+
     (unless (or auto-capitalize-mode auto-capitalize-global-mode)
       (auto-capitalize-mode 1)
       (message "auto-capitalize-mode enabled for TeX support."))
+
     (add-hook 'auto-capitalize-blocking-functions
               #'auto-capitalize-tex-blocking-function nil t)
     (add-hook 'auto-capitalize-trigger-functions
               #'auto-capitalize-tex-trigger-function nil t)
+
     (setq-local auto-capitalize--lighter
                 (concat auto-capitalize--lighter
                         auto-capitalize-tex--lighter)))))
