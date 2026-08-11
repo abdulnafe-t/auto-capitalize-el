@@ -143,7 +143,7 @@ will be enabled automatically."
       (auto-capitalize-tex-mode -1)
       (user-error "Auto-capitalize-tex-mode requires AUCTeX"))
 
-    (unless (or auto-capitalize-mode auto-capitalize-global-mode)
+    (unless auto-capitalize-mode
       (auto-capitalize-mode 1)
       (message "auto-capitalize-mode enabled for TeX support."))
 
