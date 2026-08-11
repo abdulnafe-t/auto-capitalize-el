@@ -310,14 +310,14 @@ If BUFFER-LOCAL is non-nil, only sets the buffer-local value."
                         ;; previous word is "abbrevs.").
 
                         (concat "\\<"
-                                (regexp-opt auto-capitalize-abbrevs)
+                                (regexp-opt val)
                                 "[^.[:space:]]*")
                       nil)))
     (set-default sym val)
     (setq auto-capitalize--abbrevs-regexp
           (if val
               (concat "\\<"
-                      (regexp-opt auto-capitalize-abbrevs)
+                      (regexp-opt val)
                       "[^.[:space:]]*")
             nil))))
 
