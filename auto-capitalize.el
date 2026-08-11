@@ -108,7 +108,7 @@
   :group 'convenience)
 
 
-;; Internal variables:
+;;; Internal variables:
 
 (defvar auto-capitalize--match-data nil
   "Holds match data across recursive calls in `auto-capitalize-after-change'.")
@@ -135,7 +135,7 @@ the regexp on every keystroke, and by
   "Syntax table used when deciding whether to capitalize a word.")
 
 
-;; Forward declarations to satisfy the compiler
+;;; Forward declarations to satisfy the compiler
 
 (defvar auto-capitalize-ask)
 (defvar auto-capitalize-yank)
@@ -150,7 +150,7 @@ the regexp on every keystroke, and by
 (defvar auto-capitalize-downcase-ie)
 
 
-;; Internal functions
+;;; Internal functions
 
 (defun auto-capitalize--downcase-ie (abbrev-start abbrev-end)
   "Downcase the abbreviation \"i.e.\" between ABBREV-START and ABBREV-END.
@@ -323,7 +323,7 @@ If BUFFER-LOCAL is non-nil, only sets the buffer-local value."
             nil))))
 
 
-;; User options
+;;; User options
 
 (defcustom auto-capitalize-ask nil
   "If non-nil, always ask before capitalizing."
@@ -467,7 +467,7 @@ their own trigger functions to this hook buffer-locally."
   :options (list #'auto-capitalize-default-trigger-function))
 
 
-;; User-facing functions
+;;; User-facing functions
 
 (defun auto-capitalize-default-blocking-function (_text-start word-start)
   "Block auto-capitalization if the context demands it.
