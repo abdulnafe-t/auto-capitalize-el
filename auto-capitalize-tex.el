@@ -137,9 +137,7 @@ will be enabled automatically."
                  auto-capitalize--lighter)))
 
    (t
-    (unless (and
-             (featurep 'auctex)
-             (bound-and-true-p TeX-mode-p))
+    (unless (bound-and-true-p TeX-mode-p)
       (auto-capitalize-tex-mode -1)
       (user-error "Auto-capitalize-tex-mode requires AUCTeX's `TeX-mode'"))
 
