@@ -59,7 +59,7 @@
 ;; `auto-capitalize-blocking-functions' hook gives you the right of first
 ;; refusal over capitalization: each function in that hook is called with two
 ;; arguments, TEXT-START and WORD-START, and returns non-nil to block
-;; Capitalization of the word at WORD-START. A single function in that hook
+;; capitalization of the word at WORD-START. A single function in that hook
 ;; returning non-nil causes the check fails and blocks capitalization. Note,
 ;; however, that even if every function in this hook returns nil, that does not
 ;; guarantee a word will be capitalized.
