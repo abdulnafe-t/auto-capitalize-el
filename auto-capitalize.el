@@ -143,7 +143,6 @@ the regexp on every keystroke, and by
 (defvar auto-capitalize-start-of-inline-strings)
 (defvar auto-capitalize-start-of-inline-comments)
 (defvar auto-capitalize-comments)
-(defvar auto-capitalize-outline-headings)
 (defvar auto-capitalize-fixed-case-words)
 (defvar auto-capitalize-abbrevs)
 (defvar auto-capitalize-trigger-functions)
@@ -386,14 +385,6 @@ and `auto-capitalize-default-blocking-function'."
   :group 'auto-capitalize
   :type 'boolean)
 
-(defcustom auto-capitalize-outline-headings t
-  "If non-nil, the headings in `text-mode' buffers will be capitalized.
-
-The check is done using the buffer-local value of `outline-regexp',
-which see."
-  :group 'auto-capitalize
-  :type 'boolean)
-
 (defcustom auto-capitalize-fixed-case-words '("I")
   "If non-nil, words that will always be in the case they appear in here.
 
@@ -554,24 +545,20 @@ This predicate returns non-nil if any of the following conditions hold:
 
 1) in `text-mode', TEXT-START is at the beginning of the buffer
 
-2) WORD-START is the first word in a heading, as defined by the
-buffer-local value of `outline-regexp', and
-`auto-capitalize-outline-headings' is non-nil
-
-3) WORD-START is the first word of a paragraph, as identified by either
+2) WORD-START is the first word of a paragraph, as identified by either
 `start-of-paragraph-text', or a simple newline preceding the word
 
-4) WORD-START is the first char of a sentence, identified through the
+3) WORD-START is the first char of a sentence, identified through the
 function `bounds-of-thing-at-point'. If that function returns nil, check
 to see if the preceding text matches the return value of function
 `sentence-end'
 
-5) WORD-START is the first word of a comment, as determined by
+4) WORD-START is the first word of a comment, as determined by
 `syntax-ppss', and `auto-capitalize-comments' (and
 `auto-capitalize-start-of-inline-comments', if the comment is inline) is
 non-nil.
 
-6) WORD-START is the first word of a string, as determined by
+5) WORD-START is the first word of a string, as determined by
 `syntax-ppss', and `auto-capitalize-strings' (and
 `auto-capitalize-start-of-inline-strings', if the string is inline) are
 non-nil."
@@ -582,8 +569,7 @@ non-nil."
 
      (and (derived-mode-p 'text-mode)
           (or (bobp)
-              (and auto-capitalize-outline-headings
-                   (bound-and-true-p outline-regexp)
+              (and (bound-and-true-p outline-regexp)
                    (save-excursion
                      (beginning-of-line)
                      (when (looking-at outline-regexp)

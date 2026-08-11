@@ -55,7 +55,7 @@
   "List of TeX macros whose first argument should have its first word capitalized.
 Only macros taking plain text as an argument should be included. Macros
 matching `outline-regexp' (like \\section) need not be listed, as they
-are already handled by the outline-heading check in
+are already handled by the `outline-regexp' check in
 `auto-capitalize-default-trigger-function'."
   :group 'auto-capitalize-tex
   :type '(repeat (string :tag "Macro name")))
