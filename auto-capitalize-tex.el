@@ -71,14 +71,12 @@ math envs. It also prevents capitalization of TeX macros.
 
 This predicate is added to `auto-capitalize-blocking-functions' when
 `auto-capitalize-tex-mode' is enabled."
-  (and (bound-and-true-p TeX-mode-p)
-       (save-excursion
-         (goto-char word-start)
-         (or
-          (TeX-escaped-p)               ; Macros themselves should never be
-                                        ; capitalized
-          (texmathp)
-          (equal (TeX-current-macro) "documentclass")))))
+  (save-excursion
+    (goto-char word-start)
+    (or
+     (TeX-escaped-p)   ; Macros themselves should never be capitalized
+     (texmathp)
+     (equal (TeX-current-macro) "documentclass"))))
 
 (defun auto-capitalize-tex-trigger-function (_text-start word-start)
   "Return non-nil if capitalization should occur at WORD-START.
@@ -95,8 +93,7 @@ macro, then calling `auto-capitalize-default-trigger-function'.
 
 This function is added to `auto-capitalize-trigger-functions' when
 `auto-capitalize-tex-mode' is enabled."
-  (when-let* ((_ (bound-and-true-p TeX-mode-p))
-              (macro (TeX-current-macro))
+  (when-let* ((macro (TeX-current-macro))
               (_ (member macro auto-capitalize-tex-macro-whitelist))
               (macro-start
                (save-excursion
@@ -139,7 +136,9 @@ will be enabled automatically."
                  auto-capitalize--lighter)))
 
    (t
-    (unless (featurep 'auctex)
+    (unless (and
+             (featurep 'auctex)
+             (bound-and-true-p TeX-mode-p))
       (auto-capitalize-tex-mode -1)
       (user-error "Auto-capitalize-tex-mode requires AUCTeX"))
 
