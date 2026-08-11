@@ -140,7 +140,7 @@ will be enabled automatically."
              (featurep 'auctex)
              (bound-and-true-p TeX-mode-p))
       (auto-capitalize-tex-mode -1)
-      (user-error "Auto-capitalize-tex-mode requires AUCTeX"))
+      (user-error "Auto-capitalize-tex-mode requires AUCTeX's `TeX-mode'"))
 
     (unless auto-capitalize-mode
       (auto-capitalize-mode 1)
