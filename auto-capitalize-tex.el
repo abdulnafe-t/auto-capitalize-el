@@ -20,7 +20,8 @@
 
 ;;; Commentary:
 
-;; This plugin adds TeX support to `auto-capitalize'. It requires `AUCTeX'.
+;; This plugin adds TeX support to `auto-capitalize'. It requires `AUCTeX', and
+;; it will not work with the builtin `tex-mode'.
 
 ;;; Code:
 

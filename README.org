@@ -42,9 +42,10 @@ And that’s pretty much it. Start typing to try it out!
 * Requirements
 
 =auto-capitalize-org.el= requires ~font-lock~ to detect comments and strings in ~org-mode~
-src-blocks, and ~org-src-fontify-natively~ must therefore be non-nil.
+src-blocks. ~org-src-fontify-natively~ must therefore be non-nil.
 
-=auto-capitalize-tex.el= requires [[https://www.gnu.org/software/auctex/][AUCTeX]].
+=auto-capitalize-tex.el= requires [[https://www.gnu.org/software/auctex/][AUCTeX]], and it will not work with the builtin ~tex-mode~ and
+it derived modes.
 
 * Customization
 
