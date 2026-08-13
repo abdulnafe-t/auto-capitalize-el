@@ -630,7 +630,7 @@ non-nil."
 (defun auto-capitalize-after-change (beg end length)
   "If `auto-capitalize-mode' is enabled, then start the capitalization logic.
 
-This function is installed as an `after-change-function' by
+This function is installed in the `after-change-functions' hook by
 `auto-capitalize-mode'. As such its three arguments are:
 
 BEG, END: buffer positions where the changed text starts and ends,
