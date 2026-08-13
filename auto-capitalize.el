@@ -441,6 +441,10 @@ getting capitalized when it shouldn't."
 Each function is called with two arguments (TEXT-START WORD-START) and
 should return non-nil to block capitalization in the current context.
 
+This hook complements `auto-capitalize-trigger-functions': blocking
+functions run first and always take precedence. Only if all blocking
+functions pass are the trigger functions consulted.
+
 Plugins like `auto-capitalize-org' and `auto-capitalize-tex' can add
 their own blocking functions to this hook buffer-locally."
   :group 'auto-capitalize
@@ -491,7 +495,8 @@ gated by the corresponding user options.
 
 4) if the word preceding WORD-START is in `auto-capitalize-abbrevs'
 
-5) the last typed character has word syntax."
+5) the last typed character has word syntax (see the docstring of
+`modify-syntax-entry', as well as the Info node `(elisp)Syntax Tables'."
 
   (or buffer-read-only
       (minibufferp)
@@ -543,7 +548,8 @@ gated by the corresponding user options.
 
 This predicate returns non-nil if any of the following conditions hold:
 
-1) in `text-mode', TEXT-START is at the beginning of the buffer
+1) in `text-mode', TEXT-START is at the beginning of the buffer, or
+matches `outline-regexp'
 
 2) WORD-START is the first word of a paragraph, as identified by either
 `start-of-paragraph-text', or a simple newline preceding the word
@@ -554,14 +560,12 @@ to see if the preceding text matches the return value of function
 `sentence-end'
 
 4) WORD-START is the first word of a comment, as determined by
-`syntax-ppss', and `auto-capitalize-comments' (and
-`auto-capitalize-start-of-inline-comments', if the comment is inline) is
-non-nil.
+`syntax-ppss'. This is gated by `auto-capitalize-comments' (and
+`auto-capitalize-start-of-inline-comments', if the comment is inline)
 
 5) WORD-START is the first word of a string, as determined by
-`syntax-ppss', and `auto-capitalize-strings' (and
-`auto-capitalize-start-of-inline-strings', if the string is inline) are
-non-nil."
+`syntax-ppss'. This is gated by `auto-capitalize-strings' (and
+`auto-capitalize-start-of-inline-strings', if the string is inline)."
 
   (save-excursion
     (goto-char text-start)
@@ -638,7 +642,7 @@ respectively.
 
 LENGTH: the length (in chars) of the pre-change text replaced by that
 range. In practice, this is almost always zero, except when yanking text
-and `auto-capitalize-yank' is non-nil.
+and `auto-capitalize-yank' is non-nil, or when overwriting text.
 
 This function serves as a dispatcher of other functions to decide if the
 word before point (or the yanked text) should be capitalized."
