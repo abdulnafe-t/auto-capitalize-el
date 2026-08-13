@@ -60,24 +60,25 @@
 ;; refusal over capitalization: each function in that hook is called with two
 ;; arguments, TEXT-START and WORD-START, and returns non-nil to block
 ;; capitalization of the word at WORD-START. A single function in that hook
-;; returning non-nil causes the check fails and blocks capitalization. Note,
+;; returning non-nil causes the check to fail and blocks capitalization. Note,
 ;; however, that even if every function in this hook returns nil, that does not
 ;; guarantee a word will be capitalized.
 ;;
 ;; By default, this hook only contains
-;; `auto-capitalize-default-blocking-function'. Additional plugins, like the
-;; provided `auto-capitalize-tex' and `auto-capitalize-org', can add their own
-;; predicates buffer-locally.
+;; `auto-capitalize-default-blocking-function'.
 ;;
 ;; The second hook is `auto-capitalize-trigger-functions'. These functions are
 ;; called with the same arguments as the blocking functions, and if any of them
-;; returns non-nil, capitalization occurs. By default, only
+;; return non-nil, capitalization occurs. By default, only
 ;; `auto-capitalize-default-trigger-function' is included in this hook.
 ;;
 ;; Note that the blocking functions take precedence: they are called first, and
 ;; only if they all return nil, the trigger functions get called.
 ;;
-;; Alternatively, if you don't want to write a whole new predicate, you can
+;; Additional plugins, like the provided `auto-capitalize-tex' and
+;; `auto-capitalize-org', can add their own predicates buffer-locally.
+;;
+;; Alternatively, if you don't want to write whole new predicates, you can
 ;; always customize some of the user options in the `auto-capitalize' group.
 ;; Examples include `auto-capitalize-strings', which controls whether strings in
 ;; prog-mode should be auto-capitalized, and its comment analogue
