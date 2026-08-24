@@ -4,16 +4,37 @@
 
 Automatic capitalization with batteries included.
 
-* Installation
+* Getting started
+** Requirements
+The package requires emacs version 28.1+.
 
-Put ~auto-capitalize.el~ somewhere in your load-path, then put this in your =.emacs=:
+=auto-capitalize-org.el= requires ~font-lock~ to detect comments and strings in ~org-mode~
+src-blocks. ~org-src-fontify-natively~ must therefore be non-nil.
+
+=auto-capitalize-tex.el= requires [[https://www.gnu.org/software/auctex/][AUCTeX]], and it will not work with the builtin ~tex-mode~ and
+it derived modes.
+
+** Installation
+
+*** Get it from MELPA
+
+The easiest way to get ~auto-capitalize.el~ is from MELPA:
+
+1) If you don’t have MELPA set up already,[[https://melpa.org/#/getting-started][it's very easy to do so.]]
+2) Once your ~package.el~ can talk to MELPA, you can simply say ~M-x package-install RET
+   auto-capitalize RET~.
+
+*** Get it manually
+Put ~auto-capitalize.el~ (and possibly its plugins) somewhere in your load-path, then put
+this in your =.emacs=:
 
 #+begin_src elisp
   (require 'auto-capitalize)
   (auto-capitalize-global-mode)
 #+end_src
 
-If you use ~use-package~, you can use this snippet instead:
+** Enabling auto-capitalize-mode
+If you use ~use-package~, you can use this snippet:
 
 #+begin_src elisp
   (use-package auto-capitalize
@@ -38,14 +59,6 @@ inside of any TeX macro listed in the user option ~auto-capitalize-tex-macro-whi
 well as preventing capitalization in environments such as math, equation etc.
 
 And that’s pretty much it. Start typing to try it out!
-
-* Requirements
-
-=auto-capitalize-org.el= requires ~font-lock~ to detect comments and strings in ~org-mode~
-src-blocks. ~org-src-fontify-natively~ must therefore be non-nil.
-
-=auto-capitalize-tex.el= requires [[https://www.gnu.org/software/auctex/][AUCTeX]], and it will not work with the builtin ~tex-mode~ and
-it derived modes.
 
 * Customization
 
