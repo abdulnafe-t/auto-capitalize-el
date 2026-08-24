@@ -21,8 +21,8 @@ it derived modes.
 The easiest way to get ~auto-capitalize.el~ is from MELPA:
 
 1) If you don’t have MELPA set up already,[[https://melpa.org/#/getting-started][it's very easy to do so.]]
-2) Once your ~package.el~ can talk to MELPA, you can simply say ~M-x package-install RET
-   auto-capitalize RET~.
+2) Once your ~package.el~ can talk to MELPA, you can simply say
+   ~M-x package-install RET auto-capitalize RET~.
 
 *** Get it manually
 Put ~auto-capitalize.el~ (and possibly its plugins) somewhere in your load-path, then put
