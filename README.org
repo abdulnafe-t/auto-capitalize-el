@@ -20,8 +20,9 @@ it derived modes.
 
 The easiest way to get ~auto-capitalize.el~ is from MELPA:
 
-1) If you don’t have MELPA set up already,[[https://melpa.org/#/getting-started][it's very easy to do so.]]
+1) If you don’t have MELPA set up already, [[https://melpa.org/#/getting-started][it’s easy to do so]].
 2) Once your ~package.el~ can talk to MELPA, you can simply say
+
    ~M-x package-install RET auto-capitalize RET~.
 
 *** Get it manually
@@ -198,11 +199,9 @@ The Org and TeX plugins can serve as examples of what that might look like.
 * Known issues
 
 - Even with ~auto-capitalize-tex-mode~, quoted text in ~TeX-mode~ buffers, such as
-
   #+begin_src TeX
     ``some text here``
   #+end_src
-
   does not get capitalized. Again, this only affects the first word ("some" in the
   example), as the other rules apply as usual (beginning of a sentence, comment, etc).
 
