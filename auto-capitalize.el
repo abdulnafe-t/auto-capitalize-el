@@ -49,8 +49,8 @@
 ;;       :init
 ;;       (auto-capitalize-global-mode)
 ;;       :hook
-;;       ((TeX-mode-hook . auto-capitalize-tex-mode)
-;;        (org-mode-hook . auto-capitalize-org-mode)))
+;;       ((TeX-mode . auto-capitalize-tex-mode)
+;;        (org-mode . auto-capitalize-org-mode)))
 ;;
 ;; The heart of the package is `auto-capitalize-after-change', which is
 ;; installed in `after-change-functions' when the mode is enabled. It serves as
