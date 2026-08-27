@@ -473,8 +473,7 @@ their own trigger functions to this hook buffer-locally."
 
 ;;; User-facing functions
 
-(declare-function treesit-node-at "treesit")
-(declare-function treesit-node-type "treesit")
+(declare-function treesit-thing-at-point "treesit")
 
 (defun auto-capitalize-default-blocking-function (_text-start word-start)
   "Block auto-capitalization if the context demands it.
@@ -514,27 +513,19 @@ gated by the corresponding user options.
          ;; option is nil.
          (let* ((syntax-ppss (syntax-ppss))
                 (treesitter-p (bound-and-true-p treesit-primary-parser))
-                (treesitter-node-type (when treesitter-p
-                                        (treesit-node-type
-                                         (treesit-node-at (point)))))
-
                 (in-string (or (nth 3 syntax-ppss)
-                               (and (stringp treesitter-node-type)
-                                    (string-match-p "string" treesitter-node-type))))
+                               (and treesitter-p
+                                    (treesit-thing-at-point "string" 'nested))))
                 (in-comment (or (nth 4 syntax-ppss)
-                                (and (stringp treesitter-node-type)
-                                     (string-match-p "comment" treesitter-node-type)))))
+                                (and treesitter-p
+                                     (treesit-thing-at-point "comment" 'nested)))))
            (if (derived-mode-p 'prog-mode)
                (and
-                (or (not auto-capitalize-strings)
-                    (not in-string))
-                (or (not auto-capitalize-comments)
-                    (not in-comment)))
+                (or (not auto-capitalize-strings) (not in-string))
+                (or (not auto-capitalize-comments) (not in-comment)))
              (or
-              (and in-string
-                   (not auto-capitalize-strings))
-              (and in-comment
-                   (not auto-capitalize-comments)))))
+              (and (not auto-capitalize-strings) in-string)
+              (and (not auto-capitalize-comments) in-comment))))
 
          ;; Block capitalization after any word in `auto-capitalize-abbrevs',
          ;; unless the current word is one in `auto-capitalize-fixed-case-words'
