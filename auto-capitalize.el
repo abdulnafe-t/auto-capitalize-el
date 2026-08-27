@@ -520,10 +520,10 @@ gated by the corresponding user options.
 
                 (in-string (or (nth 3 syntax-ppss)
                                (and (stringp treesitter-node-type)
-                                    (string= "string" treesitter-node-type))))
+                                    (string-match-p "string" treesitter-node-type))))
                 (in-comment (or (nth 4 syntax-ppss)
                                 (and (stringp treesitter-node-type)
-                                     (string= "comment" treesitter-node-type)))))
+                                     (string-match-p "comment" treesitter-node-type)))))
            (if (derived-mode-p 'prog-mode)
                (and
                 (or (not auto-capitalize-strings)
