@@ -473,6 +473,9 @@ their own trigger functions to this hook buffer-locally."
 
 ;;; User-facing functions
 
+(declare-function treesit-node-at "treesit")
+(declare-function treesit-node-type "treesit")
+
 (defun auto-capitalize-default-blocking-function (_text-start word-start)
   "Block auto-capitalization if the context demands it.
 
@@ -500,27 +503,41 @@ gated by the corresponding user options.
 
   (or buffer-read-only
       (minibufferp)
-
-      ;; If in prog-mode, don't block inside comments or strings if the
-      ;; corresponding option is non-nil
-      ;;
-      ;; If not in prog-mode, don't block if outside of comments or strings,
-      ;; and only block inside comments or strings if the corresponding option
-      ;; is nil.
       (save-excursion
         (goto-char word-start)
         (or
-         (if (derived-mode-p 'prog-mode)
-             (and
-              (or (not auto-capitalize-strings) (not (nth 3 (syntax-ppss))))
-              (or (not auto-capitalize-comments) (not (nth 4 (syntax-ppss)))))
-           (or
-            (and (nth 3 (syntax-ppss)) (not auto-capitalize-strings))
-            (and (nth 4 (syntax-ppss)) (not auto-capitalize-comments))))
+         ;; If in prog-mode, don't block inside comments or strings if the
+         ;; corresponding option is non-nil
+         ;;
+         ;; If not in prog-mode, don't block if outside of comments or strings,
+         ;; and only block inside comments or strings if the corresponding
+         ;; option is nil.
+         (let* ((syntax-ppss (syntax-ppss))
+                (treesitter-p (bound-and-true-p treesit-primary-parser))
+                (treesitter-node-type (when treesitter-p
+                                        (treesit-node-type
+                                         (treesit-node-at (point)))))
+
+                (in-string (or (nth 3 syntax-ppss)
+                               (and (stringp treesitter-node-type)
+                                    (string= "string" treesitter-node-type))))
+                (in-comment (or (nth 4 syntax-ppss)
+                                (and (stringp treesitter-node-type)
+                                     (string= "comment" treesitter-node-type)))))
+           (if (derived-mode-p 'prog-mode)
+               (and
+                (or (not auto-capitalize-strings)
+                    (not in-string))
+                (or (not auto-capitalize-comments)
+                    (not in-comment)))
+             (or
+              (and in-string
+                   (not auto-capitalize-strings))
+              (and in-comment
+                   (not auto-capitalize-comments)))))
 
          ;; Block capitalization after any word in `auto-capitalize-abbrevs',
          ;; unless the current word is one in `auto-capitalize-fixed-case-words'
-
          (with-syntax-table auto-capitalize--syntax-table
            (and
             (not (looking-at auto-capitalize--fixed-case-regexp))
