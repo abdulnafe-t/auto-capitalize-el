@@ -149,6 +149,9 @@ the regexp on every keystroke, and by
 (defvar auto-capitalize-blocking-functions)
 (defvar auto-capitalize-downcase-ie)
 
+;; Used in `auto-capitalize-default-blocking-function'
+(declare-function treesit-thing-at-point "treesit")
+
 
 ;;; Internal functions
 
@@ -472,8 +475,6 @@ their own trigger functions to this hook buffer-locally."
 
 
 ;;; User-facing functions
-
-(declare-function treesit-thing-at-point "treesit")
 
 (defun auto-capitalize-default-blocking-function (_text-start word-start)
   "Block auto-capitalization if the context demands it.
