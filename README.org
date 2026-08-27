@@ -51,8 +51,8 @@ using the provided plugins =auto-capitalize-org.el= and/or =auto-capitalize-tex.
     :init
     (auto-capitalize-global-mode)
     :hook
-    ((TeX-mode-hook . auto-capitalize-tex-mode)
-     (org-mode-hook . auto-capitalize-org-mode)))
+    ((TeX-mode . auto-capitalize-tex-mode)
+     (org-mode . auto-capitalize-org-mode)))
 #+end_src
 
 This will give you markup-aware capitalization in those modes, such as capitalizing text
