@@ -79,6 +79,10 @@ only enable =auto-capitalize.el= in text-mode buffers, but not prog-mode, you co
     text-mode)
 #+end_src
 
+Note, however, that the global mode will not enable ~auto-capitalize-mode~ in major modes
+where it shouldn’t: see the user option ~auto-capitalize-global-modes~. Enabling the minor
+mode either manually or via a general hook will not give you that protection.
+
 ** User options
 
 You can set the following boolean options for more fine-grained control:
@@ -202,14 +206,14 @@ The Org and TeX plugins can serve as examples of what that might look like.
   #+begin_src TeX
     ``some text here``
   #+end_src
-  does not get capitalized. Again, this only affects the first word ("some" in the
-  example), as the other rules apply as usual (beginning of a sentence, comment, etc).
+  does not get capitalized. This only affects the first word ("some" in the example), as
+  the other rules apply as usual (beginning of a sentence, comment, etc).
 
 - The package struggles with markup languages in general, hence the need for plugins that
   teach ~auto-capitalize~ different markup syntaxes.
 
 - The abbreviation "i.e." is always downcased, even if it appears at the start of a
-  sentence.
+  Sentence, if the user option ~auto-capitalize-downcase-ie~ is non-nil (the default).
 
 Of course, if you have ideas on how to solve any of these issues or otherwise improve the
 package, PRs are more than welcome :)
@@ -233,7 +237,7 @@ it for security reasons, along with other packages whose upstream was the wiki, 
 
 The [[https://github.com/yuutayamada/auto-capitalize-el][fork by Yuta Yamada]] on GitHub is the basis for this package. Although it appears
 unmaintained now, the work he put into refactoring it was the starting point for this
-package.
+version.
 
-Note that this package is not fully compatible with either the original or Yuta Yamada’s
+Note that this version is not fully compatible with either the original or Yuta Yamada’s
 fork: the interface is different, and it drops XEmacs support entirely.
