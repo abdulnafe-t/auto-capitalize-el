@@ -12,7 +12,7 @@ The package requires emacs version 28.1+.
 src-blocks. ~org-src-fontify-natively~ must therefore be non-nil.
 
 =auto-capitalize-tex.el= requires [[https://www.gnu.org/software/auctex/][AUCTeX]], and it will not work with the builtin ~tex-mode~ and
-it derived modes.
+its derived modes.
 
 ** Installation
 
