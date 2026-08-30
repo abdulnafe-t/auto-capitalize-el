@@ -574,12 +574,12 @@ function `bounds-of-thing-at-point'. If that function returns nil, check
 to see if the preceding text matches the return value of function
 `sentence-end'
 
-4) WORD-START is the first word of a comment, as determined by
-`syntax-ppss'. This is gated by `auto-capitalize-comments' (and
+4) WORD-START is the first word of a comment. This is gated by
+`auto-capitalize-comments' (and
 `auto-capitalize-start-of-inline-comments', if the comment is inline)
 
-5) WORD-START is the first word of a string, as determined by
-`syntax-ppss'. This is gated by `auto-capitalize-strings' (and
+5) WORD-START is the first word of a string. This is gated by
+`auto-capitalize-strings' (and
 `auto-capitalize-start-of-inline-strings', if the string is inline)."
 
   (save-excursion
