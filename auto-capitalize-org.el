@@ -31,7 +31,7 @@
 (declare-function org-at-item-p "org-list")
 (defvar org-list-full-item-re)
 (defvar org-todo-regexp)
-(defvar org-priority-value-regexp)
+(defvar org-priority-regexp)
 
 (defgroup auto-capitalize-org nil
   "Org support for auto-capitalize."
@@ -93,7 +93,7 @@ org comments do not play nice with `bounds-of-thing-at-point' or
 `start-of-paragraph-text'
 
 2) The first word in an org heading after `org-todo-regexp' and
-`org-priority-value-regexp'
+`org-priority-regexp'
 
 3) The first word of an org list."
 
@@ -117,7 +117,7 @@ org comments do not play nice with `bounds-of-thing-at-point' or
                        ;; after TODO-regexp
                        (looking-at (concat org-todo-regexp "\\(?: \\|$\\)")))
               (goto-char (match-end 0)))
-            (when (looking-at (format "\\[#\\(?:%s\\)\\]" org-priority-value-regexp))
+            (when (looking-at org-priority-regexp)
               (goto-char (match-end 0)))
             (skip-syntax-forward "^w")
             (= word-start (point))))
