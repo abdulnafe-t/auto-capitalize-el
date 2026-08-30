@@ -72,7 +72,9 @@ will be enabled automatically."
    (t
     (unless auto-capitalize-mode
       (auto-capitalize-mode 1)
-      (message "auto-capitalize-mode enabled for SGML support."))
+      (message "auto-capitalize-mode enabled for SGML (%s) support."
+               (replace-regexp-in-string "\\(-ts\\)?-mode" ""
+                                         (symbol-name major-mode))))
     (add-hook 'auto-capitalize-blocking-functions
               #'auto-capitalize-sgml-blocking-function nil t)
 
