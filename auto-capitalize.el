@@ -150,7 +150,7 @@ the regexp on every keystroke, and by
 (defvar auto-capitalize-downcase-ie)
 
 ;; Used in `auto-capitalize-default-blocking-function'
-(declare-function treesit-thing-at-point "treesit")
+(declare-function treesit-thing-at "treesit")
 
 
 ;;; Internal functions
@@ -516,10 +516,10 @@ gated by the corresponding user options.
                 (treesitter-p (bound-and-true-p treesit-primary-parser))
                 (in-string (or (nth 3 syntax-ppss)
                                (and treesitter-p
-                                    (treesit-thing-at-point "string" 'nested))))
+                                    (treesit-thing-at (point) "string"))))
                 (in-comment (or (nth 4 syntax-ppss)
                                 (and treesitter-p
-                                     (treesit-thing-at-point "comment" 'nested)))))
+                                     (treesit-thing-at (point) "comment")))))
            (if (derived-mode-p 'prog-mode)
                (and
                 (or (not auto-capitalize-strings) (not in-string))
@@ -617,7 +617,11 @@ to see if the preceding text matches the return value of function
      (and auto-capitalize-comments
           auto-capitalize-start-of-inline-comments
           (save-excursion
-            (when-let* ((comment-start (nth 8 (syntax-ppss))))
+            (when-let* ((comment-start
+                         (or
+                          (nth 8 (syntax-ppss))
+                          (and (bound-and-true-p treesit-primary-parser)
+                               (treesit-node-start (treesit-thing-at (point) "comment"))))))
               (= word-start
                  (save-excursion
                    (goto-char comment-start)
@@ -628,7 +632,11 @@ to see if the preceding text matches the return value of function
      (and auto-capitalize-strings
           (save-excursion
             (goto-char word-start)
-            (when-let* ((string-start (nth 8 (syntax-ppss))))
+            (when-let* ((string-start
+                         (or
+                          (nth 8 (syntax-ppss))
+                          (and (bound-and-true-p treesit-primary-parser)
+                               (treesit-node-start (treesit-thing-at (point) "string"))))))
               (and (or auto-capitalize-start-of-inline-strings
                        (progn (goto-char string-start)
                               (skip-chars-backward "\"'")
