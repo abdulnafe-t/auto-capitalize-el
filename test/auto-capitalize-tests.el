@@ -31,13 +31,11 @@
 (require 'auto-capitalize-sgml)
 (when (featurep 'auctex)
   (require 'auto-capitalize-tex))
-(require 'font-lock)                    ; For `font-lock-ensure'
 
 (defmacro auto-capitalize-tests--setup (mode &rest body)
   "Set up a buffer for auto-capitalize-tests."
   `(ert-with-test-buffer
-       (:name "*auto-capitalize-tests*"
-              :selected t)
+       (:name "*auto-capitalize-tests*")
      (,mode)
      (auto-capitalize-mode 1)
      (electric-quote-local-mode -1)
@@ -203,7 +201,7 @@ chars."
     (unwind-protect
         (auto-capitalize-tests--setup
          text-mode
-         (setopt auto-capitalize-fixed-case-words '("I"))
+         (customize-set-variable 'auto-capitalize-fixed-case-words '("I"))
          (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
          (insert "a")
          (ert-simulate-command '(self-insert-command 1 ?\s))
@@ -215,7 +213,7 @@ chars."
            (should (equal (buffer-substring-no-properties (point-min) (point-max))
                           (concat "\nA I" (char-to-string trigger))))
            (backward-delete-char 2)))
-      (setopt auto-capitalize-fixed-case-words cached))))
+      (customize-set-variable 'auto-capitalize-fixed-case-words cached))))
 
 
 ;;;; Tests for `tex-mode'
@@ -439,7 +437,7 @@ chars."
    (ert-simulate-command '(self-insert-command 1 ?*))
    (ert-simulate-command '(self-insert-command 1 ?\s))
    (ert-simulate-command '(self-insert-command 1 ?a))
-   (ert-play-keys "SPC")
+   (ert-simulate-command '(self-insert-command 1 ?\s))
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
                   "* A "))))
 
@@ -450,7 +448,7 @@ chars."
    (ert-simulate-command '(self-insert-command 1 ?*))
    (ert-simulate-command '(self-insert-command 1 ?\s))
    (ert-simulate-command '(self-insert-command 1 ?a))
-   (ert-play-keys "RET")
+    (ert-simulate-command '(org-return))
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
                   "* A\n"))))
 
@@ -460,9 +458,9 @@ chars."
    org-mode
    (insert "* TODO ")
    (ert-simulate-command '(self-insert-command 1 ?a))
-   (ert-play-keys "SPC")
-   (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                  "* TODO A "))))
+    (ert-simulate-command '(self-insert-command 1 ?\s))
+    (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                   "* TODO A "))))
 
 (ert-deftest auto-capitalize-org-headings-priority ()
   "Capitalize the first word in `org-mode' headings with a priority."
@@ -470,9 +468,9 @@ chars."
    org-mode
    (insert "* [#B] ")
    (ert-simulate-command '(self-insert-command 1 ?a))
-   (ert-play-keys "SPC")
-   (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                  "* [#B] A "))))
+    (ert-simulate-command '(self-insert-command 1 ?\s))
+    (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                   "* [#B] A "))))
 
 (ert-deftest auto-capitalize-org-headings-todo-priority ()
   "Capitalize the first word in `org-mode' headings with a TODO keyword and priority."
@@ -480,9 +478,9 @@ chars."
    org-mode
    (insert "* TODO [#A] ")
    (ert-simulate-command '(self-insert-command 1 ?a))
-   (ert-play-keys "SPC")
-   (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                  "* TODO [#A] A "))))
+    (ert-simulate-command '(self-insert-command 1 ?\s))
+    (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                   "* TODO [#A] A "))))
 
 (ert-deftest auto-capitalize-org-src-code ()
   "Don’t capitalize source code in `org-mode' src blocks."
@@ -497,6 +495,7 @@ chars."
 
 (ert-deftest auto-capitalize-org-src-comments ()
   "Capitalize comments in `org-mode' src blocks."
+  (skip-unless (version-list-< '(9 8) (version-to-list (org-version))))
   (auto-capitalize-tests--setup
    org-mode
    (let ((org-src-content-indentation 0))
@@ -511,6 +510,7 @@ chars."
 
 (ert-deftest auto-capitalize-org-src-comments-disabled ()
   "Don't capitalize comments in src blocks when `auto-capitalize-comments' is nil."
+  (skip-unless (version-list-< '(9 8) (version-to-list (org-version))))
   (auto-capitalize-tests--setup
    org-mode
    (let ((org-src-content-indentation 0)
@@ -646,7 +646,7 @@ docstrings."
         (auto-capitalize-tests--setup
          emacs-lisp-mode
          (let ((auto-capitalize-comments t))
-           (setopt auto-capitalize-fixed-case-words '("eMaCs"))
+           (customize-set-variable 'auto-capitalize-fixed-case-words '("eMaCs"))
            (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
            (ert-simulate-command '(comment-dwim 2))
            (insert "emacs")
@@ -655,7 +655,7 @@ docstrings."
                           "\n;; eMaCs ")))
          (erase-buffer)
          (let ((auto-capitalize-strings t))
-           (setopt auto-capitalize-fixed-case-words '("eMaCs"))
+           (customize-set-variable 'auto-capitalize-fixed-case-words '("eMaCs"))
            (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
            (insert "\"\"")
            (backward-char)
@@ -665,7 +665,7 @@ docstrings."
                           "\n\"eMaCs \"")))
          (erase-buffer)
          (let ((auto-capitalize-strings t))
-           (setopt auto-capitalize-fixed-case-words '("eMaCs" "Emacsen"))
+           (customize-set-variable 'auto-capitalize-fixed-case-words '("eMaCs" "Emacsen"))
            (ert-simulate-command '(newline))   ; Avoid repeating `auto-capitalize-bob'
            (insert "\"\"")
            (backward-char)
@@ -673,7 +673,7 @@ docstrings."
            (ert-simulate-command `(self-insert-command 1 ?\s))
            (should (equal (buffer-substring-no-properties (point-min) (point-max))
                           "\n\"Emacsen \""))))
-      (setopt auto-capitalize-fixed-case-words cached))))
+      (customize-set-variable 'auto-capitalize-fixed-case-words cached))))
 
 (ert-deftest auto-capitalize-python-def-docstring ()
   "Capitalize the first word (and no other words) in `python-mode' function
@@ -856,8 +856,7 @@ comments."
   "Don't activate `auto-capitalize-mode' in any major mode excluded in `auto-capitalize-global-modes'."
   (auto-capitalize-global-mode)
   (ert-with-test-buffer
-      (:name "*Auto-capitalize-test-buffer*"
-             :selected t)
+      (:name "*Auto-capitalize-test-buffer*")
     (dolist (mode (cdar auto-capitalize-global-modes))
       (when (fboundp mode)
         (funcall mode)
