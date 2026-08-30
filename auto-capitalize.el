@@ -489,12 +489,12 @@ return non-nil to block capitalization if any of them hold:
 
 2) it is a minibuffer
 
-3) if in `prog-mode', the current text is in neither a comment nor a
-string, or it is but the corresponding user
-option (`auto-capitalize-comments' or `auto-capitalize-strings') is nil.
-Outside of `prog-mode', capitalizing text other than comments or strings
+3) if in `text-mode', capitalizing text other than comments or strings
 is not blocked, while capitalization in comments/strings is similarly
-gated by the corresponding user options.
+gated by the corresponding user options. If outside of `text-mode', the
+current text is in neither a comment nor a string, or it is but the
+corresponding user option (`auto-capitalize-comments' or
+`auto-capitalize-strings') is nil.
 
 4) if the word preceding WORD-START is in `auto-capitalize-abbrevs'
 
@@ -506,12 +506,18 @@ gated by the corresponding user options.
       (save-excursion
         (goto-char word-start)
         (or
-         ;; If in prog-mode, don't block inside comments or strings if the
-         ;; corresponding option is non-nil
+         ;; If in text-mode, don't block if outside of comments or strings, and
+         ;; only block inside comments or strings if the corresponding option is
+         ;; nil.
          ;;
-         ;; If not in prog-mode, don't block if outside of comments or strings,
-         ;; and only block inside comments or strings if the corresponding
-         ;; option is nil.
+         ;; If not in text-mode (if in prog-mode), don't block inside comments
+         ;; or strings if the corresponding option is non-nil, but block
+         ;; everything else.
+         ;;
+         ;; NOTE: the text-mode check must come first, so that plain text in
+         ;; modes that derive from both text-mode and prog-mode (such as
+         ;; `mhtml-ts-mode') does not get blocked
+         .
          (let* ((syntax-ppss (syntax-ppss))
                 (treesitter-p (bound-and-true-p treesit-primary-parser))
                 (in-string (or (nth 3 syntax-ppss)
@@ -520,13 +526,13 @@ gated by the corresponding user options.
                 (in-comment (or (nth 4 syntax-ppss)
                                 (and treesitter-p
                                      (treesit-thing-at (point) "comment")))))
-           (if (derived-mode-p 'prog-mode)
-               (and
-                (or (not auto-capitalize-strings) (not in-string))
-                (or (not auto-capitalize-comments) (not in-comment)))
-             (or
-              (and (not auto-capitalize-strings) in-string)
-              (and (not auto-capitalize-comments) in-comment))))
+           (if (derived-mode-p 'text-mode)
+               (or
+                (and (not auto-capitalize-strings) in-string)
+                (and (not auto-capitalize-comments) in-comment))
+             (and
+              (or (not auto-capitalize-strings) (not in-string))
+              (or (not auto-capitalize-comments) (not in-comment)))))
 
          ;; Block capitalization after any word in `auto-capitalize-abbrevs',
          ;; unless the current word is one in `auto-capitalize-fixed-case-words'
