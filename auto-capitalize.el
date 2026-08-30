@@ -865,12 +865,15 @@ This will install `auto-capitalize-after-change' in the current buffer's
                               ; `auto-capitalize-tex-mode'
                     tex-mode  ; (Builtin) Unsupported.
 
+
+                    ;; This mode requires `auto-capitalize-sgml-mode'. Derived
+                    ;; modes include `html-mode', `html-ts-mode',
+                    ;; `heex-ts-mode', and `mhtml-ts-mode'.
+                    sgml-mode
+
                     ;; TODO: we should add plugins to support these.
                     texinfo-mode
-                    html-mode
                     nxml-mode
-                    sgml-mode
-                    heex-ts-mode
                     php-ts-mode
 
                     ;; Technically text-modes, but capitalization
