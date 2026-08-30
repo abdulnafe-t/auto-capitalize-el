@@ -806,6 +806,34 @@ for both inline comments and newline-based (BOL) comments."
                     "<!--- a  --->")))))
 
 
+;;;; Tests for `sgml-mode'
+
+(ert-deftest auto-capitalize-html-body ()
+  "Capitalize HTML body text."
+  (auto-capitalize-tests--setup
+   html-mode
+   (insert "<html>\n<body>\n\n</body>\n</html>")
+   (search-backward "<body>\n")
+   (forward-char 7)
+   (ert-simulate-command '(self-insert-command 1 ?a))
+   (ert-simulate-command '(self-insert-command 1 ?\s))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                  "<html>\n<body>\nA \n</body>\n</html>"))))
+
+(ert-deftest auto-capitalize-html-tags ()
+  "Don't capitalize HTML tags."
+  (auto-capitalize-tests--setup
+   html-mode
+   (insert "<html>\n\n</html>")
+   (search-backward "<html>\n")
+   (forward-char 7)
+   (ert-simulate-command '(self-insert-command 1 ?<))
+   (ert-simulate-command '(self-insert-command 1 ?p))
+   (ert-simulate-command '(self-insert-command 1 ?\s))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                  "<html>\n<p \n</html>"))))
+
+
 ;;;; Tests for treesitter-modes
 
 (ert-deftest auto-capitalize-mhtml-ts-comments ()
