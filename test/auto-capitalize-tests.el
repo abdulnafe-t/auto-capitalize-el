@@ -624,7 +624,7 @@ Test both cases depending on the value of the user option
 docstrings."
   (auto-capitalize-tests--setup
    emacs-lisp-mode
-   (insert "(defun test-func ()")
+   (insert "(defun test_func ()")
    (ert-simulate-command '(newline))
    (insert "\"\"")
    (backward-char)
@@ -633,7 +633,7 @@ docstrings."
    (ert-simulate-command '(self-insert-command 1 ?a))
    (ert-simulate-command '(self-insert-command 1 ?\s))
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                  "(defun test-func ()\n\"A a \""))))
+                  "(defun test_func ()\n\"A a \""))))
 
 (ert-deftest auto-capitalize-prog-fixed-case ()
   "Capitalize words in `auto-capitalize-fixed-case-words'."
@@ -676,7 +676,7 @@ docstrings."
 docstrings."
   (auto-capitalize-tests--setup
    python-mode
-   (insert "def test-func:")
+   (insert "def test_func:")
    (ert-simulate-command '(newline))
    (insert "\"\"\"\"\"\"")
    (backward-char 3)
@@ -685,7 +685,7 @@ docstrings."
    (ert-simulate-command '(self-insert-command 1 ?a))
    (ert-simulate-command '(self-insert-command 1 ?\s))
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                  "def test-func:\n\"\"\"A a \"\"\""))))
+                  "def test_func:\n\"\"\"A a \"\"\""))))
 
 (ert-deftest auto-capitalize-prog-start-of-inline-strings ()
   "Test `auto-capitalize-start-of-inline-strings' off and on,
