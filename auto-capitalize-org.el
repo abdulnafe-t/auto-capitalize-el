@@ -37,6 +37,11 @@
   "Org support for auto-capitalize."
   :group 'auto-capitalize)
 
+(defcustom auto-capitalize-org-block-org-blocks t
+  "Non-nil means to block capitalization of org blocks."
+  :type 'boolean
+  :group 'auto-capitalize-org)
+
 (defvar auto-capitalize-org--lighter "/Org"
   "Appended to `auto-capitalize--lighter' by `auto-capitalize-org-mode'.")
 
@@ -56,18 +61,24 @@ corresponding user option is nil
 This predicate is added to `auto-capitalize-blocking-functions' (which
 see)."
   (and (derived-mode-p 'org-mode)
+       (or
+        (and
+         (or (not (nth 3 (syntax-ppss)))
+             (not auto-capitalize-strings))
 
-       (or (not (nth 3 (syntax-ppss)))
-           (not auto-capitalize-strings))
+         (or (and (not (nth 4 (syntax-ppss)))
+                  (not (org-at-comment-p)))
+             (not auto-capitalize-comments))
 
-       (or (and (not (nth 4 (syntax-ppss)))
-                (not (org-at-comment-p)))
-           (not auto-capitalize-comments))
+         (or (nth 3 (syntax-ppss))
+             (nth 4 (syntax-ppss))
+             (org-at-comment-p)
+             (org-in-src-block-p)))
 
-       (or (nth 3 (syntax-ppss))
-           (nth 4 (syntax-ppss))
-           (org-at-comment-p)
-           (org-in-src-block-p))))
+        (and auto-capitalize-org-block-org-blocks
+             (save-excursion
+               (beginning-of-line)
+               (looking-at "#\\+"))))))
 
 (defun auto-capitalize-org-trigger-function (_text-start word-start)
   "Trigger capitalization in `org-mode' buffers.
