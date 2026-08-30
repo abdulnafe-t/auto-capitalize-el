@@ -151,7 +151,7 @@ will be enabled automatically."
                  auto-capitalize--lighter)))
 
    (t
-    (unless (or auto-capitalize-mode auto-capitalize-global-mode)
+    (unless auto-capitalize-mode
       (auto-capitalize-mode 1)
       (message "auto-capitalize-mode enabled for Org support."))
     (add-hook 'auto-capitalize-blocking-functions

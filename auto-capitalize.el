@@ -871,6 +871,9 @@ This will install `auto-capitalize-after-change' in the current buffer's
                     ;; `heex-ts-mode', and `mhtml-ts-mode'.
                     sgml-mode
 
+                    ;; Unsupported without `auto-capitalize-org-mode'
+                    org-mode
+
                     ;; TODO: we should add plugins to support these.
                     texinfo-mode
                     nxml-mode
