@@ -495,7 +495,7 @@ chars."
 
 (ert-deftest auto-capitalize-org-src-comments ()
   "Capitalize comments in `org-mode' src blocks."
-  (skip-unless (version-list-< '(9 8) (version-to-list (org-version))))
+  (skip-unless (version<= "9.8" (org-version)))
   (auto-capitalize-tests--setup
    org-mode
    (let ((org-src-content-indentation 0))
@@ -510,7 +510,7 @@ chars."
 
 (ert-deftest auto-capitalize-org-src-comments-disabled ()
   "Don't capitalize comments in src blocks when `auto-capitalize-comments' is nil."
-  (skip-unless (version-list-< '(9 8) (version-to-list (org-version))))
+  (skip-unless (version<= "9.8" (org-version)))
   (auto-capitalize-tests--setup
    org-mode
    (let ((org-src-content-indentation 0)
