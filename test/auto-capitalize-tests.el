@@ -28,6 +28,7 @@
 (require 'ert-x)                        ; For `ert-simulate-command'
 (require 'auto-capitalize)
 (require 'auto-capitalize-org)
+(require 'auto-capitalize-sgml)
 (when (featurep 'auctex)
   (require 'auto-capitalize-tex))
 (require 'font-lock)                    ; For `font-lock-ensure'
@@ -47,6 +48,9 @@
      (when (and (derived-mode-p 'org-mode)
                 (fboundp 'auto-capitalize-org-mode))
        (auto-capitalize-org-mode 1))
+     (when (and (derived-mode-p 'sgml-mode)
+                (fboundp 'auto-capitalize-sgml-mode))
+       (auto-capitalize-sgml-mode 1))
      (progn ,@body)))
 
 
@@ -800,6 +804,23 @@ for both inline comments and newline-based (BOL) comments."
      (ert-simulate-command '(self-insert-command 1 ?\s))
      (should (equal (buffer-substring-no-properties (point-min) (point-max))
                     "<!--- a  --->")))))
+
+
+;;;; Tests for treesitter-modes
+
+(ert-deftest auto-capitalize-mhtml-ts-comments ()
+  "Capitalize the first word in embedded `mhtml-ts-mode' JavaScript
+comments."
+  (skip-unless (fboundp 'mhtml-ts-mode))
+  (auto-capitalize-tests--setup
+   mhtml-ts-mode
+   (insert "<script>\nlet x; // \n</script>")
+   (search-backward "// ")
+   (forward-char 3)
+   (ert-simulate-command '(self-insert-command 1 ?a))
+   (ert-simulate-command '(self-insert-command 1 ?\s))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                  "<script>\nlet x; // A \n</script>"))))
 
 ;;;; Misc.
 
