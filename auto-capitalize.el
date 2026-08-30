@@ -517,7 +517,7 @@ corresponding user option (`auto-capitalize-comments' or
          ;; NOTE: the text-mode check must come first, so that plain text in
          ;; modes that derive from both text-mode and prog-mode (such as
          ;; `mhtml-ts-mode') does not get blocked
-         .
+
          (let* ((syntax-ppss (syntax-ppss))
                 (treesitter-p (bound-and-true-p treesit-primary-parser))
                 (in-string (or (nth 3 syntax-ppss)
@@ -619,40 +619,43 @@ to see if the preceding text matches the return value of function
          (skip-syntax-backward "^w" (line-beginning-position))
          (looking-at (sentence-end))))
 
-     ;; Beginning of a comment?
-     (and auto-capitalize-comments
-          auto-capitalize-start-of-inline-comments
-          (save-excursion
-            (when-let* ((comment-start
-                         (or
-                          (nth 8 (syntax-ppss))
-                          (and (bound-and-true-p treesit-primary-parser)
-                               (treesit-node-start (treesit-thing-at (point) "comment"))))))
-              (= word-start
-                 (save-excursion
-                   (goto-char comment-start)
-                   (skip-syntax-forward "^w")
-                   (point))))))
+     (let* ((syntax-ppss (syntax-ppss))
+            (treesitter-p (bound-and-true-p treesit-primary-parser)))
+       (or
+        ;; Beginning of a comment?
+        (and auto-capitalize-comments
+             auto-capitalize-start-of-inline-comments
+             (save-excursion
+               (when-let* ((comment-start
+                            (or
+                             (nth 8 syntax-ppss)
+                             (and treesitter-p
+                                  (treesit-node-start (treesit-thing-at (point) "comment"))))))
+                 (= word-start
+                    (save-excursion
+                      (goto-char comment-start)
+                      (skip-syntax-forward "^w")
+                      (point))))))
 
-     ;; Beginning of a string?
-     (and auto-capitalize-strings
-          (save-excursion
-            (goto-char word-start)
-            (when-let* ((string-start
-                         (or
-                          (nth 8 (syntax-ppss))
-                          (and (bound-and-true-p treesit-primary-parser)
-                               (treesit-node-start (treesit-thing-at (point) "string"))))))
-              (and (or auto-capitalize-start-of-inline-strings
-                       (progn (goto-char string-start)
-                              (skip-chars-backward "\"'")
-                              (skip-chars-backward " \t")
-                              (bolp)))
-                   (= word-start
-                      (save-excursion
-                        (goto-char string-start)
-                        (skip-syntax-forward "^w")
-                        (point))))))))))
+        ;; Beginning of a string?
+        (and auto-capitalize-strings
+             (save-excursion
+               (goto-char word-start)
+               (when-let* ((string-start
+                            (or
+                             (nth 8 syntax-ppss)
+                             (and treesitter-p
+                                  (treesit-node-start (treesit-thing-at (point) "string"))))))
+                 (and (or auto-capitalize-start-of-inline-strings
+                          (progn (goto-char string-start)
+                                 (skip-chars-backward "\"'")
+                                 (skip-chars-backward " \t")
+                                 (bolp)))
+                      (= word-start
+                         (save-excursion
+                           (goto-char string-start)
+                           (skip-syntax-forward "^w")
+                           (point))))))))))))
 
 (defun auto-capitalize-after-change (beg end length)
   "If `auto-capitalize-mode' is enabled, then start the capitalization logic.
