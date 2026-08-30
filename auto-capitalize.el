@@ -628,25 +628,27 @@ to see if the preceding text matches the return value of function
           (and auto-capitalize-comments
                auto-capitalize-start-of-inline-comments
                (save-excursion
-                 (when-let* ((comment-start
-                              (or
-                               (nth 8 syntax-ppss)
-                               (and treesitter-p
-                                    (treesit-node-start (treesit-thing-at word-start "comment"))))))
+                  (when-let* ((comment-start
+                               (or
+                                (and (nth 4 syntax-ppss)
+                                     (nth 8 syntax-ppss))
+                                (and treesitter-p
+                                     (treesit-node-start (treesit-thing-at word-start "comment"))))))
                    (= word-start
                       (save-excursion
                         (goto-char comment-start)
                         (skip-syntax-forward "^w")
                         (point))))))
 
-          ;; Beginning of a string?
-          (and auto-capitalize-strings
-               (save-excursion
-                 (when-let* ((string-start
-                              (or
-                               (nth 8 syntax-ppss)
-                               (and treesitter-p
-                                    (treesit-node-start (treesit-thing-at word-start "string"))))))
+         ;; Beginning of a string?
+         (and auto-capitalize-strings
+              (save-excursion
+                (when-let* ((string-start
+                             (or
+                              (and (nth 3 syntax-ppss)
+                                   (nth 8 syntax-ppss))
+                              (and treesitter-p
+                                   (treesit-node-start (treesit-thing-at word-start "string"))))))
                    (and (or auto-capitalize-start-of-inline-strings
                             (progn (goto-char string-start)
                                    (skip-chars-backward "\"'")
