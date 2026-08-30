@@ -43,8 +43,14 @@ If you use ~use-package~, you can use this snippet:
     (auto-capitalize-global-mode))
 #+end_src
 
-If you’re interested in using this package in your Org or TeX documents, then consider
-using the provided plugins =auto-capitalize-org.el= and/or =auto-capitalize-tex.el=, like so:
+** Enabling plugins
+By itself, ~auto-capitalize-mode~ does not work in markup documents. That’s where the
+plugins come in. Currently, ~auto-capitalize~ supports three such markup languages: Org with
+=auto-capitalize-org.el=, TeX with =auto-capitalize-tex.el=, assuming ~AUCTeX~ is installed, and
+SGML (and its derivatives, like HTML, MHTML, etc) with =auto-capitalize-sgml.el=.
+
+To make use of these plugins, simply add the corresponding minor mode to the appropriate
+hook:
 
 #+begin_src elisp
   (use-package auto-capitalize
@@ -52,21 +58,23 @@ using the provided plugins =auto-capitalize-org.el= and/or =auto-capitalize-tex.
     (auto-capitalize-global-mode)
     :hook
     ((TeX-mode . auto-capitalize-tex-mode)
-     (org-mode . auto-capitalize-org-mode)))
+     (org-mode . auto-capitalize-org-mode)
+     (sgml-mode . auto-capitalize-sgml-mode))
 #+end_src
 
 This will give you markup-aware capitalization in those modes, such as capitalizing text
-inside of any TeX macro listed in the user option ~auto-capitalize-tex-macro-whitelist~, as
-well as preventing capitalization in environments such as math, equation etc.
+inside of any TeX macro listed in the user option ~auto-capitalize-tex-macro-whitelist~, not
+capitalizing HTML tags, preventing capitalization in TeX math environments, etc.
 
 And that’s pretty much it. Start typing to try it out!
 
 * Customization
 
 Things should just work for most users, with sensible defaults. ~auto-capitalize-mode~
-respects your settings such as ~sentence-end-double-space~ and ~paragraph-indent-minor-mode~.
-However, there are customization options in the ~auto-capitalize~ group, which should let
-you get the exact behavior you want.
+respects your settings such as ~sentence-end-double-space~ and ~paragraph-indent-minor-mode~,
+and should work fine with both traditional modes and treesitter-based ones. However, there
+are customization options in the ~auto-capitalize~ group, which should let you get the exact
+behavior you want.
 
 If you want to limit auto-capitalization to certain modes instead of enabling it globally,
 replace ~auto-capitalize-global-mode~ in the snippets above with ~auto-capitalize-mode~, which
