@@ -206,7 +206,7 @@ things:
      ~auto-capitalize-global-modes~ excludes, the plugin must enable ~auto-capitalize-mode~
      itself.
 
-The Org and TeX plugins can serve as examples of what that might look like.
+The Org, TeX, and SGML plugins can serve as examples of what that might look like.
 
 * Known issues
 
