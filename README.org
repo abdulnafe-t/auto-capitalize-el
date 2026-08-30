@@ -11,7 +11,8 @@ Automatic capitalization with batteries included.
 The package requires emacs version 28.1+.
 
 =auto-capitalize-org.el= requires ~font-lock~ to detect comments and strings in ~org-mode~
-src-blocks. ~org-src-fontify-natively~ must therefore be non-nil.
+src-blocks. ~org-src-fontify-natively~ must therefore be non-nil, and org itself must be of
+version 9.8 at least.
 
 =auto-capitalize-tex.el= requires [[https://www.gnu.org/software/auctex/][AUCTeX]], and it will not work with the builtin ~tex-mode~ and
 its derived modes.
@@ -224,6 +225,9 @@ The Org, TeX, and SGML plugins can serve as examples of what that might look lik
 
 - The abbreviation "i.e." is always downcased, even if it appears at the start of a
   Sentence, if the user option ~auto-capitalize-downcase-ie~ is non-nil (the default).
+
+- On older versions of org (< 9.8), native syntax properties of src-blocks are not
+  applied, which means ~auto-capitalize~ can’t capitalize comments in src-block.
 
 Of course, if you have ideas on how to solve any of these issues or otherwise improve the
 package, PRs are more than welcome :)
