@@ -853,7 +853,6 @@ This will install `auto-capitalize-after-change' in the current buffer's
                ;; are really keys that shouldn't be capitalized.
                ;;
                ;; There's also a couple of misc. modes, such as `bib-mode.'
-               ;; Unsure how to handle those. Exclude them by default.
                ;;
                ;; This is meant to be defensive: we only enable auto-cap where
                ;; we know it can work. Any plugin that teaches auto-cap about
