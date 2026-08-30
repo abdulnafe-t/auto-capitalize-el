@@ -2,6 +2,8 @@
 #+author: Abdulnafé Toulaïmat
 #+language: en_US
 
+[[https://melpa.org/#/auto-capitalize][file:https://melpa.org/packages/auto-capitalize-badge.svg]]
+
 Automatic capitalization with batteries included.
 
 * Getting started
