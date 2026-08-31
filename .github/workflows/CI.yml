@@ -46,7 +46,7 @@ jobs:
                 (setq package-install-upgrade-built-in t)
                 (unless (package-installed-p 'compat '(31 0))
                   (package-install 'compat))
-                  (when (equal \"${{ matrix.auctex }}\" \"with_acutex\")
+                (when (equal \"${{ matrix.auctex }}\" \"with_auctex\")
                       (package-install 'auctex)))"
 
       - name: Compile
