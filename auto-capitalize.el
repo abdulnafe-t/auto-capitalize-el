@@ -520,7 +520,9 @@ corresponding user option (`auto-capitalize-comments' or
          ;; `mhtml-ts-mode') does not get blocked
 
          (let* ((syntax-ppss (syntax-ppss))
-                (treesitter-p (bound-and-true-p treesit-primary-parser))
+                (treesitter-p (and (bound-and-true-p treesit-primary-parser)
+                                   (fboundp 'treesit-thing-at)
+                                   (fboundp 'treesit-node-start)))
                 (in-string (or (nth 3 syntax-ppss)
                                (and treesitter-p
                                     (treesit-thing-at (point) "string"))))
@@ -623,7 +625,9 @@ to see if the preceding text matches the return value of function
      (save-excursion
        (goto-char word-start)
        (let* ((syntax-ppss (syntax-ppss))
-              (treesitter-p (bound-and-true-p treesit-primary-parser)))
+              (treesitter-p (and (bound-and-true-p treesit-primary-parser)
+                                 (fboundp 'treesit-thing-at)
+                                 (fboundp 'treesit-node-start))))
          (or
           ;; Beginning of a comment?
           (and auto-capitalize-comments
