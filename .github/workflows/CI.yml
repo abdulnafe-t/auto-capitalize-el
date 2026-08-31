@@ -84,7 +84,7 @@ jobs:
         run: |
           emacs -Q --batch -L . \
             --eval "(progn (package-initialize) \
-                    (setq package-lint-main-file \"auto-capitalize.el\") \
+                    (setq package-lint-main-file \"auto-capitalize.el\"))" \
             -f package-lint-batch-and-exit \
             *.el"
 
