@@ -79,7 +79,8 @@ jobs:
 
       - name: Lint (package-lint)
         run: |
-          emacs -Q --batch -L . -l package-lint \
+          emacs -Q --batch -L . \
+            --eval "(package-initialize)" \
             --eval '(setq package-lint-main-file "auto-capitalize.el")' \
             -f package-lint-batch-and-exit \
             *.el
