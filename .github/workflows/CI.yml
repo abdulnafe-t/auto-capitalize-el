@@ -61,3 +61,33 @@ jobs:
         env:
           WITH_AUCTEX: ${{ matrix.auctex }}
         run: ./run-tests.sh
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: purcell/setup-emacs@bdc64dc730ae1fcba200bfd52cb1b4cf6159cbe5 # v8.0
+        with:
+          version: 31.1
+
+      - name: Install package-lint
+        run: |
+          emacs -Q --batch \
+            --eval "(progn (package-initialize) (package-refresh-contents) (unless (package-installed-p 'package-lint) (package-install 'package-lint)))"
+
+      - name: Lint (package-lint)
+        run: |
+          emacs -Q --batch -L . -l package-lint \
+            --eval '(setq package-lint-main-file "auto-capitalize.el")' \
+            -f package-lint-batch-and-exit \
+            *.el
+
+      - name: Lint (checkdoc)
+        run: |
+          emacs -Q --batch -L . \
+            --eval "(progn (require 'checkdoc) (setq sentence-end-double-space nil) \
+                    (dolist (f command-line-args-left) \
+                      (find-file f) (checkdoc-batch)))" \
+            *.el
