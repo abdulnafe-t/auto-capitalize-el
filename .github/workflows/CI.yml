@@ -11,11 +11,26 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        auctex: [yes, no]
 
     steps:
       - uses: actions/checkout@v4
       - uses: purcell/setup-emacs@v8.0
         with:
           version: 31.1
+
+      - name: Install AUCTeX
+        if: matrix.auctex == 'yes'
+        run: |
+          emacs -Q --batch \
+            --eval "(package-initialize)" \
+            --eval "(package-refresh-contents)" \
+            --eval "(unless (package-installed-p 'auctex) (package-install 'auctex))"
+
       - name: Run tests
+        env:
+          WITH_AUCTEX: ${{ matrix.auctex }}
         run: ./run-tests.sh
