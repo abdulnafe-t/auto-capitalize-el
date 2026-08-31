@@ -43,6 +43,7 @@ jobs:
           "(progn
                 (package-initialize)
                 (package-refresh-contents)
+                (advice-add 'package--compile :override #'ignore)
                 (setq package-install-upgrade-built-in t)
                 (unless (package-installed-p 'compat '(31 0))
                   (package-install 'compat))
@@ -78,6 +79,7 @@ jobs:
           "(progn
                 (package-initialize)
                 (package-refresh-contents)
+                (advice-add 'package--compile :override #'ignore)
                 (package-install 'package-lint))"
 
       - name: Lint (package-lint)
