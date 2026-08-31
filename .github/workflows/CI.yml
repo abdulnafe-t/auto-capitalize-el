@@ -86,7 +86,7 @@ jobs:
             --eval "(progn (package-initialize) \
                     (setq package-lint-main-file \"auto-capitalize.el\"))" \
             -f package-lint-batch-and-exit \
-            *.el"
+            *.el
 
       - name: Lint (checkdoc)
         run: |
