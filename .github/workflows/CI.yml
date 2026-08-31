@@ -74,21 +74,24 @@ jobs:
 
       - name: Install package-lint
         run: |
-          emacs -Q --batch \
-            --eval "(progn (package-initialize) (package-refresh-contents) (package-install 'package-lint))"
+          emacs -Q --batch --eval \
+          "(progn
+                (package-initialize)
+                (package-refresh-contents)
+                (package-install 'package-lint))"
 
       - name: Lint (package-lint)
         run: |
           emacs -Q --batch -L . \
-            --eval "(package-initialize)" \
-            --eval '(setq package-lint-main-file "auto-capitalize.el")' \
+            --eval "(progn (package-initialize) \
+                    (setq package-lint-main-file \"auto-capitalize.el\") \
             -f package-lint-batch-and-exit \
-            *.el
+            *.el"
 
       - name: Lint (checkdoc)
         run: |
           emacs -Q --batch -L . \
             --eval "(progn (require 'checkdoc) (setq sentence-end-double-space nil) \
                     (dolist (f command-line-args-left) \
-                      (find-file f) (checkdoc-batch)))" \
+                    (find-file f) (checkdoc-batch)))" \
             *.el
