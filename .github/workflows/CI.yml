@@ -40,16 +40,13 @@ jobs:
       - name: Install dependencies
         run: |
           emacs -Q --batch \
-            --eval "(package-initialize)" \
-            --eval "(package-refresh-contents)" \
-            --eval "(progn (setq package-install-upgrade-built-in t) \
+            --eval "(progn (package-initialize) \
+                    (package-refresh-contents) \
+                    (setq package-install-upgrade-built-in t) \
                     (unless (package-installed-p 'compat '(31 0)) \
-                      (package-install 'compat)))"
-          if [ "${{ matrix.auctex }}" = yes ]; then
-            emacs -Q --batch \
-              --eval "(package-initialize)" \
-              --eval "(unless (package-installed-p 'auctex) (package-install 'auctex))"
-          fi
+                      (package-install 'compat)) \
+                    (when (equal \"${{ matrix.auctex }}\" \"yes\") \
+                      (package-install 'auctex)))"
 
       - name: Compile
         run: |
@@ -77,7 +74,7 @@ jobs:
       - name: Install package-lint
         run: |
           emacs -Q --batch \
-            --eval "(progn (package-initialize) (package-refresh-contents) (unless (package-installed-p 'package-lint) (package-install 'package-lint)))"
+            --eval "(progn (package-initialize) (package-refresh-contents) (package-install 'package-lint))"
 
       - name: Lint (package-lint)
         run: |
