@@ -152,6 +152,7 @@ the regexp on every keystroke, and by
 
 ;; Used in `auto-capitalize-default-blocking-function'
 (declare-function treesit-thing-at "treesit")
+(declare-function treesit-node-start "treesit.c")
 
 
 ;;; Internal functions
