@@ -29,7 +29,7 @@
 
 (defgroup auto-capitalize-sgml
   nil
-  "Cusotmization group for auto-capitalize-sgml"
+  "Cusotmization group for auto-capitalize-sgml."
   :group 'auto-capitalize)
 
 (defun auto-capitalize-sgml-blocking-function (_text-start word-start)
