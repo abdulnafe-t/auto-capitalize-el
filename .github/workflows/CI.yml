@@ -55,8 +55,7 @@ jobs:
             --eval "(setq byte-compile-error-on-warn t)" \
             --eval "(package-initialize)" \
             -f batch-byte-compile \
-            auto-capitalize.el auto-capitalize-org.el auto-capitalize-sgml.el \
-            auto-capitalize-tex.el
+            *.el
 
       - name: Run tests
         env:
