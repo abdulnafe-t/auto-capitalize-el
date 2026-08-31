@@ -836,10 +836,22 @@ for both inline comments and newline-based (BOL) comments."
 
 ;;;; Tests for treesitter-modes
 
+(defun auto-capitalize-tests--ts-grammar-available-p (lang)
+  "Return non-nil if the tree-sitter grammar for LANG is available.
+Returns nil when the current Emacs predates the tree-sitter API."
+  (and (fboundp 'treesit-language-available-p)
+       (treesit-language-available-p lang)))
+
 (ert-deftest auto-capitalize-mhtml-ts-comments ()
   "Capitalize the first word in embedded `mhtml-ts-mode' JavaScript
 comments."
-  (skip-unless (fboundp 'mhtml-ts-mode))
+  ;; `mhtml-ts-mode' requires the `html', `javascript', `css' and
+  ;; `jsdoc' grammars.
+  (skip-unless (and (fboundp 'mhtml-ts-mode)
+                    (auto-capitalize-tests--ts-grammar-available-p 'html)
+                    (auto-capitalize-tests--ts-grammar-available-p 'javascript)
+                    (auto-capitalize-tests--ts-grammar-available-p 'css)
+                    (auto-capitalize-tests--ts-grammar-available-p 'jsdoc)))
   (auto-capitalize-tests--setup
    mhtml-ts-mode
    (insert "<script>\nlet x; // \n</script>")
@@ -859,8 +871,12 @@ comments."
       (:name "*Auto-capitalize-test-buffer*")
     (dolist (mode (cdar auto-capitalize-global-modes))
       (when (fboundp mode)
-        (funcall mode)
-        (should-not auto-capitalize-mode)))))
+        ;; `php-ts-mode' requires the `php' grammar, which may not be
+        ;; installed; skip just this mode, not the whole test.
+        (unless (and (eq mode 'php-ts-mode)
+                     (not (auto-capitalize-tests--ts-grammar-available-p 'php)))
+          (funcall mode)
+          (should-not auto-capitalize-mode))))))
 
 (provide 'auto-capitalize-tests)
 ;;; auto-capitalize-tests.el ends here
