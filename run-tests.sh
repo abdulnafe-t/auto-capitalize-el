@@ -4,9 +4,9 @@ set -eu
 EMACS=${EMACS:-emacs}
 
 # Control whether AUCTeX tests run:
-#   Yes            -> require AUCTeX, error if not found
-#   No             -> don’t load AUCTeX (AUCTeX tests skip)
-#   Auto (default) -> use AUCTeX if found else skip its tests
+#   with_auctex            -> require AUCTeX, error if not found
+#   without_auctex             -> don’t load AUCTeX (AUCTeX tests skip)
+#   auto (default) -> use AUCTeX if found else skip its tests
 WITH_AUCTEX=${WITH_AUCTEX:-auto}
 
 get_package_dir() {
@@ -33,15 +33,15 @@ run_tests() {
 }
 
 case "$WITH_AUCTEX" in
-  yes)
+  with_auctex)
     if ! is_auctex_dir; then
-      echo "run-tests: WITH_AUCTEX=yes but no AUCTeX installation found" >&2
+      echo "run-tests: WITH_AUCTEX=with_auctex but no AUCTeX installation found" >&2
       exit 1
     fi
     echo "run-tests: running with AUCTeX at $AUCTEX_DIR"
     run_tests -L "$AUCTEX_DIR" --eval "(require 'tex)"
     ;;
-  no)
+  without_auctex)
     echo "run-tests: running without AUCTeX"
     run_tests
     ;;
@@ -55,7 +55,7 @@ case "$WITH_AUCTEX" in
     fi
     ;;
   *)
-    echo "run-tests: unknown WITH_AUCTEX='$WITH_AUCTEX' (expected yes, no or auto)" >&2
+    echo "run-tests: unknown WITH_AUCTEX='$WITH_AUCTEX' (expected with_auctex, without_auctex or auto)" >&2
     exit 1
     ;;
 esac
