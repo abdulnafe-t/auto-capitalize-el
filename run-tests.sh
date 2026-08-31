@@ -2,15 +2,47 @@
 set -eu
 
 EMACS=${EMACS:-emacs}
-AUCTEX_DIR=$(find ~/.config/emacs/elpa -type d -name 'auctex-*' 2>/dev/null | sort | tail -n 1)
+
+# Control whether AUCTeX tests run:
+#   Yes            -> require AUCTeX, error if not found
+#   No             -> don’t load AUCTeX (AUCTeX tests skip)
+#   Auto (default) -> use AUCTeX if found else skip its tests
+WITH_AUCTEX=${WITH_AUCTEX:-auto}
+AUCTEX_DIR=${AUCTEX_DIR:-$(find "$HOME" -path '*/elpa/auctex-*' -type d -prune 2>/dev/null | sort | tail -n 1 )}
+
+is_auctex_dir() {
+  [ -d "$AUCTEX_DIR" ] && [ -f "$AUCTEX_DIR/tex.el" ]
+}
 
 run_tests() {
   exec "$EMACS" --batch "$@" -l test/auto-capitalize-tests.el \
     -f ert-run-tests-batch-and-exit
 }
 
-if [ -n "$AUCTEX_DIR" ]; then
-  run_tests -L . -L "$AUCTEX_DIR" --eval "(require 'tex)"
-else
-  run_tests -L .
-fi
+case "$WITH_AUCTEX" in
+  yes)
+    if ! is_auctex_dir; then
+      echo "run-tests: WITH_AUCTEX=yes but no AUCTeX installation found" >&2
+      exit 1
+    fi
+    echo "run-tests: running with AUCTeX at $AUCTEX_DIR"
+    run_tests -L . -L "$AUCTEX_DIR" --eval "(require 'tex)"
+    ;;
+  no)
+    echo "run-tests: running without AUCTeX"
+    run_tests -L .
+    ;;
+  auto)
+    if is_auctex_dir; then
+      echo "run-tests: running with AUCTeX at $AUCTEX_DIR"
+      run_tests -L . -L "$AUCTEX_DIR" --eval "(require 'tex)"
+    else
+      echo "run-tests: running without AUCTeX"
+      run_tests -L .
+    fi
+    ;;
+  *)
+    echo "run-tests: unknown WITH_AUCTEX='$WITH_AUCTEX' (expected yes, no or auto)" >&2
+    exit 1
+    ;;
+esac
