@@ -42,7 +42,9 @@ jobs:
           emacs -Q --batch \
             --eval "(package-initialize)" \
             --eval "(package-refresh-contents)" \
-            --eval "(unless (package-installed-p 'compat '(31 0)) (package-install 'compat))"
+            --eval "(progn (setq package-install-upgrade-built-in t) \
+                    (unless (package-installed-p 'compat '(31 0)) \
+                      (package-install 'compat)))"
           if [ "${{ matrix.auctex }}" = yes ]; then
             emacs -Q --batch \
               --eval "(package-initialize)" \
