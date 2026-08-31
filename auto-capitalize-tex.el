@@ -95,7 +95,7 @@ macro, then calling `auto-capitalize-default-trigger-function'.
 This function is added to `auto-capitalize-trigger-functions' when
 `auto-capitalize-tex-mode' is enabled."
   (when-let* ((macro (TeX-current-macro))
-              (_ (member macro auto-capitalize-tex-macro-whitelist))
+              (whitelisted-p (member macro auto-capitalize-tex-macro-whitelist))
               (macro-start
                (save-excursion
                  (goto-char word-start)
