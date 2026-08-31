@@ -2,7 +2,13 @@ name: CI
 
 on:
   push:
+    paths-ignore:
+      - '*.org'
+      - '*.md'
   pull_request:
+    paths-ignore:
+      - '*.org'
+      - '*.md'
   workflow_dispatch:
 
 permissions:
