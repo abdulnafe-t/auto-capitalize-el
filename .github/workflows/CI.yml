@@ -30,7 +30,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         emacs: [28.1, 29.1, 30.1, 31.1, snapshot]
-        auctex: [with_auctex, without_auctex]
         exclude:
           - os: windows-latest
             emacs: 31.1
@@ -44,7 +43,7 @@ jobs:
         with:
           version: ${{ matrix.emacs }}
 
-      - name: Install dependencies
+      - name: Install compat
         run: |
           emacs -Q --batch --eval \
           "(progn
@@ -55,9 +54,7 @@ jobs:
                 (advice-add 'package--compile :override #'ignore)
                 (setq package-install-upgrade-built-in t)
                 (unless (package-installed-p 'compat '(31 0))
-                  (package-install 'compat))
-                (when (equal \"${{ matrix.auctex }}\" \"with_auctex\")
-                      (package-install 'auctex)))"
+                  (package-install 'compat)))"
 
       - name: Compile
         run: |
@@ -67,9 +64,25 @@ jobs:
             -f batch-byte-compile \
             *.el
 
-      - name: Run tests
+      - name: Run tests (without AUCTeX)
         env:
-          WITH_AUCTEX: ${{ matrix.auctex }}
+          WITH_AUCTEX: without_auctex
+        run: ./run-tests.sh
+
+      - name: Install AUCTeX
+        run: |
+          emacs -Q --batch --eval \
+          "(progn
+                (package-initialize)
+                (when (eq system-type 'windows-nt)
+                  (setq package-check-signature nil))
+                (package-refresh-contents)
+                (advice-add 'package--compile :override #'ignore)
+                (package-install 'auctex))"
+
+      - name: Run tests (with AUCTeX)
+        env:
+          WITH_AUCTEX: with_auctex
         run: ./run-tests.sh
 
   lint:
