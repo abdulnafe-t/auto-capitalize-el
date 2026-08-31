@@ -878,7 +878,7 @@ This will install `auto-capitalize-after-change' in the current buffer's
                     ;; TODO: we should add plugins to support these.
                     texinfo-mode
                     nxml-mode
-                    php-ts-mode
+                    php-mode
 
                     ;; Technically text-modes, but capitalization
                     ;; doesn't make much sense. Likely to stay excluded.
@@ -886,9 +886,7 @@ This will install `auto-capitalize-after-change' in the current buffer's
                     nroff-mode
                     conf-mode
                     toml-mode
-                    toml-ts-mode
                     yaml-mode
-                    yaml-ts-mode
                     json-mode ; Also excludes `json-ts-mode'
 
                     ;; FIXME: is it really necessary to exclude these?
