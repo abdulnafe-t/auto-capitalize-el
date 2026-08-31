@@ -685,8 +685,8 @@ word before point (or the yanked text) should be capitalized."
              (text-start
               (save-excursion
                 (goto-char word-start)
-                (cl-loop while (or (minusp (skip-chars-backward "\""))
-                                   (minusp (skip-syntax-backward "\"("))))
+                (cl-loop while (or (< (skip-chars-backward "\"") 0)
+                                   (< (skip-syntax-backward "\"(") 0)))
                 (point))))
         (when (or (null auto-capitalize-blocking-functions)
                   (not (run-hook-with-args-until-success
