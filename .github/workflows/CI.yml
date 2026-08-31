@@ -24,13 +24,17 @@ jobs:
         with:
           version: ${{ matrix.emacs }}
 
-      - name: Install AUCTeX
-        if: matrix.auctex == 'yes'
+      - name: Install dependencies
         run: |
           emacs -Q --batch \
             --eval "(package-initialize)" \
             --eval "(package-refresh-contents)" \
-            --eval "(unless (package-installed-p 'auctex) (package-install 'auctex))"
+            --eval "(unless (package-installed-p 'compat) (package-install 'compat))"
+          if [ "${{ matrix.auctex }}" = yes ]; then
+            emacs -Q --batch \
+              --eval "(package-initialize)" \
+              --eval "(unless (package-installed-p 'auctex) (package-install 'auctex))"
+          fi
 
       - name: Run tests
         env:
