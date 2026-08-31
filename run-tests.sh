@@ -8,13 +8,22 @@ EMACS=${EMACS:-emacs}
 #   No             -> don’t load AUCTeX (AUCTeX tests skip)
 #   Auto (default) -> use AUCTeX if found else skip its tests
 WITH_AUCTEX=${WITH_AUCTEX:-auto}
-AUCTEX_DIR=${AUCTEX_DIR:-$(find "$HOME" -path '*/elpa/auctex-*' -type d -prune 2>/dev/null | sort | tail -n 1 )}
 
-is_auctex_dir() {
-  [ -d "$AUCTEX_DIR" ] && [ -f "$AUCTEX_DIR/tex.el" ]
+get_package_dir() {
+  emacs --batch --eval \
+    "(progn
+       (require (quote package))
+       (package-initialize)
+       (when-let ((pkg-struct (car (alist-get (quote $1) package-alist))))
+         (princ (package-desc-dir pkg-struct))))"
 }
 
-COMPAT_DIR=${COMPAT_DIR:-$(find "$HOME" -type d -name 'compat-*' -prune -exec test -f '{}/compat.el' \; -print 2>/dev/null | sort | tail -n 1 )}
+AUCTEX_DIR=${AUCTEX_DIR:-$(get_package_dir auctex)}
+COMPAT_DIR=${COMPAT_DIR:-$(get_package_dir compat)}
+
+is_auctex_dir() {
+    [ -d "$AUCTEX_DIR" ]
+}
 
 run_tests() {
   exec "$EMACS" --batch -L . \
