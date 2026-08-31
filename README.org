@@ -4,7 +4,7 @@
 
 [[https://melpa.org/#/auto-capitalize][file:https://melpa.org/packages/auto-capitalize-badge.svg]]
 [[https://stable.melpa.org/#/auto-capitalize][file:https://stable.melpa.org/packages/auto-capitalize-badge.svg]]
-[[https://github.com/abdulnafe-t/auto-capitalize.el/actions][file:https://github.com/abdulnafe-t/auto-capitalize.el/workflows/CI/badge.svg]]
+[[https://github.com/abdulnafe-t/auto-capitalize.el/actions/workflows/CI.yml][file:https://github.com/abdulnafe-t/auto-capitalize.el/actions/workflows/CI.yml/badge.svg?branch=main]]
 
 Automatic capitalization with batteries included.
 
