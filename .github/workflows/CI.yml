@@ -49,6 +49,8 @@ jobs:
           emacs -Q --batch --eval \
           "(progn
                 (package-initialize)
+                (when (eq system-type 'windows-nt)
+                  (setq package-check-signature nil))
                 (package-refresh-contents)
                 (advice-add 'package--compile :override #'ignore)
                 (setq package-install-upgrade-built-in t)
