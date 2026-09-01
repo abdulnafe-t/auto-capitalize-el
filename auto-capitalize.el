@@ -89,7 +89,7 @@
 ;; This package is a revamp of Yuta Yamada’s version
 ;; (https://github.com/yuutayamada/auto-capitalize-el), which is itself a fork
 ;; of the original auto-capitalize.el, written by Kevin Rodgers and shared on
-;; the emacswiki (https://www.emacswiki.org/emacs/auto-capitalize.el). I have
+;; the emacs wiki (https://www.emacswiki.org/emacs/auto-capitalize.el). I have
 ;; tried to streamline the code, building on the refactoring process that Yuta
 ;; Yamada had already started, and removing/replacing old artifacts with their
 ;; modern equivalent. I have also modified the package’s interface to make it
@@ -151,7 +151,7 @@ the regexp on every keystroke, and by
 (defvar auto-capitalize-blocking-functions)
 (defvar auto-capitalize-downcase-ie)
 
-;; Used in `auto-capitalize-default-blocking-function'
+;; Used in the default blocking and trigger functions
 (declare-function treesit-thing-at "treesit")
 (declare-function treesit-node-start "treesit.c")
 
@@ -837,7 +837,10 @@ Interactively, uses completion to select an existing word."
   "Toggle `auto-capitalize' minor mode in the current buffer.
 
 This will install `auto-capitalize-after-change' in the current buffer's
- `after-change-functions'."
+ `after-change-functions'.
+
+If the current buffer is a temp buffer, that is, if its name begins with
+a space, this command does nothing."
 
   :init-value nil
   :lighter auto-capitalize--lighter
@@ -847,15 +850,14 @@ This will install `auto-capitalize-after-change' in the current buffer's
    ((not auto-capitalize-mode)
     (remove-hook 'after-change-functions #'auto-capitalize-after-change t))
 
-   ;; A buffer whose name starts with a space is usually a temp buffer, unless
-   ;; it's visiting a file whose name starts with a space.
-
-   ;; In practice, a buffer visiting a file whose name starts with a space gets
-   ;; a "|" prepended to its name, so the buffer-file-name guard is probably
-   ;; unnecessary.
+   ;; Ephemeral/temp buffer; refuse to enable. A buffer whose name starts with a
+   ;; space is usually a temp buffer, unless it's visiting a file whose name
+   ;; starts with a space.
+   ;;
+   ;; NOTE: In practice, a buffer visiting such a file gets a "|" prepended to
+   ;; its name, so the buffer-file-name guard is probably unnecessary.
    ((and (null buffer-file-name)
          (eq (aref (buffer-name (current-buffer)) 0) ?\s))
-    ;; Ephemeral/temp buffer; refuse to enable.
     (auto-capitalize-mode -1))
 
    ;; Turn on
@@ -879,35 +881,37 @@ This will install `auto-capitalize-after-change' in the current buffer's
                ;; these modes will need to activate `auto-capitalize-mode'
                ;; itself.
 
-               (not TeX-mode  ; (AUCTeX) Unsupported without
-                              ; `auto-capitalize-tex-mode'
-                    tex-mode  ; (Builtin) Unsupported.
+               (not
+                ;; (AUCTeX) Unsupported without `auto-capitalize-tex-mode'
+                TeX-mode
+                ;; (Builtin) Unsupported.
+                tex-mode
 
-                    ;; This mode requires `auto-capitalize-sgml-mode'. Derived
-                    ;; modes include `html-mode', `html-ts-mode',
-                    ;; `heex-ts-mode', and `mhtml-ts-mode'.
-                    sgml-mode
+                ;; This mode requires `auto-capitalize-sgml-mode'. Derived
+                ;; modes include `html-mode', `html-ts-mode',
+                ;; `heex-ts-mode', and `mhtml-ts-mode'.
+                sgml-mode
 
-                    ;; Unsupported without `auto-capitalize-org-mode'
-                    org-mode
+                ;; Unsupported without `auto-capitalize-org-mode'
+                org-mode
 
-                    ;; TODO: we should add plugins to support these.
-                    texinfo-mode
-                    nxml-mode
-                    php-mode
+                ;; TODO: we should add plugins to support these.
+                texinfo-mode
+                nxml-mode
+                php-mode
 
-                    ;; Technically text-modes, but capitalization
-                    ;; doesn't make much sense. Likely to stay excluded.
-                    css-base-mode
-                    nroff-mode
-                    conf-mode
-                    toml-mode
-                    yaml-mode
-                    json-mode ; Also excludes `json-ts-mode'
+                ;; Technically text-modes, but capitalization
+                ;; doesn't make much sense. Likely to stay excluded.
+                css-base-mode
+                nroff-mode
+                conf-mode
+                toml-mode
+                yaml-mode
+                json-mode
 
-                    ;; FIXME: is it really necessary to exclude these?
-                    bib-mode
-                    icalendar-mode)
+                ;; FIXME: is it really necessary to exclude these?
+                bib-mode
+                icalendar-mode)
 
                ;; NOTE: the excluded modes should come before the included ones.
                text-mode prog-mode))
