@@ -41,9 +41,9 @@ installing from MELPA. The main difference is that VC packages are not upgraded 
 the rest: you need to call ~package-vc-upgrade~ or ~package-vc-upgrade-all~ for that.
 
 **** Manually
-Of course, there’s always the good old way of cloning the repo or copying the files
-manually and putting them somewhere your emacs can find them. For example, run this in a
-terminal:
+Of course, there’s always the good old way of cloning the repo or downloading [[https://github.com/abdulnafe-t/auto-capitalize.el/releases][the latest
+release]] manually and putting the files somewhere your emacs can find them. For example,
+you could run this in a terminal:
 
 #+begin_src sh
 git clone https://github.com/abdulnafe-t/auto-capitalize.el ~/.config/emacs/elpa/auto-capitalize
