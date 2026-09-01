@@ -889,5 +889,17 @@ comments."
     (lisp-data-mode)
     (should-not auto-capitalize-mode)))
 
+(ert-deftest auto-capitalize-scratch-buffer ()
+  "Make sure `auto-capitalize-mode' works in *scratch*."
+  (auto-capitalize-global-mode)
+  (setq inhibit-splash-screen t)
+  (with-current-buffer "*scratch*"
+    (should auto-capitalize-mode)
+    (ert-simulate-command '(comment-dwim 2))
+    (ert-simulate-command '(self-insert-command 1 ?a))
+    (ert-simulate-command '(self-insert-command 1 ?\s))
+    (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                                                   ";; A "))))
+
 (provide 'auto-capitalize-tests)
 ;;; auto-capitalize-tests.el ends here
