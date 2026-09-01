@@ -831,6 +831,19 @@ Interactively, uses completion to select an existing word."
                                    buffer-local)
   (message "%s" auto-capitalize-fixed-case-words))
 
+(defun auto-capitalize-mode--turn-on ()
+  "Enable `auto-capitalize-mode' if appropriate."
+  ;; A buffer whose name starts with a space is usually a temp buffer, unless
+  ;; it's visiting a file whose name starts with a space.
+
+  ;; In practice, a buffer visiting a file whose name starts with a space gets a
+  ;; "|" prepended to its name, so the buffer-file-name guard is probably
+  ;; unnecessary.
+
+  (if (or (buffer-file-name)
+          (not (eq (aref (buffer-name (current-buffer)) 0) ?\s)))
+      (auto-capitalize-mode)))
+
 ;;;###autoload
 (define-minor-mode auto-capitalize-mode
   "Toggle `auto-capitalize' minor mode in the current buffer.
@@ -852,7 +865,7 @@ This will install `auto-capitalize-after-change' in the current buffer's
 
 ;;;###autoload
 (define-globalized-minor-mode auto-capitalize-global-mode
-  auto-capitalize-mode auto-capitalize-mode
+  auto-capitalize-mode auto-capitalize-mode--turn-on
   :predicate '(;; We exclude a number of modes derived from `text-mode' (and
                ;; some from `prog-mode'), because we know that auto-cap would
                ;; make too many mistakes in such modes. These are either modes

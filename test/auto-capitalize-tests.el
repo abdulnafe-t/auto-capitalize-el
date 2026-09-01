@@ -878,5 +878,16 @@ comments."
           (funcall mode)
           (should-not auto-capitalize-mode))))))
 
+(ert-deftest auto-capitalize-temp-buffers-test ()
+  "Don't activate `auto-capitalize-mode' in any temp buffer."
+  (auto-capitalize-global-mode)
+  (with-temp-buffer
+    (emacs-lisp-mode)
+    (should-not auto-capitalize-mode))
+
+  (with-temp-buffer
+    (lisp-data-mode)
+    (should-not auto-capitalize-mode)))
+
 (provide 'auto-capitalize-tests)
 ;;; auto-capitalize-tests.el ends here
