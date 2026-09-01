@@ -13,7 +13,7 @@ Automatic capitalization with batteries included.
 The package requires emacs version 28.1+.
 
 =auto-capitalize-org.el= requires ~font-lock~ to detect comments and strings in ~org-mode~
-src-blocks. ~org-src-fontify-natively~ must therefore be non-nil, and org itself must be of
+src blocks. ~org-src-fontify-natively~ must therefore be non-nil, and org itself must be of
 version 9.8 at least.
 
 =auto-capitalize-tex.el= requires [[https://www.gnu.org/software/auctex/][AUCTeX]], and it will not work with the builtin ~tex-mode~ and
@@ -48,9 +48,13 @@ If you use ~use-package~, you can use this snippet:
     (auto-capitalize-global-mode))
 #+end_src
 
+That’s all you need to get capitalization in ~prog-mode~ buffers, both traditional and
+treesitter-based, and ~text-mode~ buffers that don’t have any special markup syntax. For
+those, you’ll need a plugin.
+
 ** Enabling plugins
-By itself, ~auto-capitalize-mode~ does not work in markup documents. That’s where the
-plugins come in. Currently, ~auto-capitalize~ supports three such markup languages: Org with
+By itself, ~auto-capitalize-mode~ does not work in markup documents. Currently,
+~auto-capitalize~ comes with plugins for three such markup languages: Org with
 =auto-capitalize-org.el=, TeX with =auto-capitalize-tex.el=, assuming ~AUCTeX~ is installed, and
 SGML (and its derivatives, like HTML, MHTML, etc) with =auto-capitalize-sgml.el=.
 
@@ -68,8 +72,8 @@ hook:
 #+end_src
 
 This will give you markup-aware capitalization in those modes, such as capitalizing text
-inside of any TeX macro listed in the user option ~auto-capitalize-tex-macro-whitelist~, not
-capitalizing HTML tags, preventing capitalization in TeX math environments, etc.
+inside of any TeX macro listed in ~auto-capitalize-tex-macro-whitelist~, not capitalizing
+HTML tags, preventing capitalization in TeX math environments, etc.
 
 And that’s pretty much it. Start typing to try it out!
 
@@ -112,11 +116,11 @@ You can set the following boolean options for more fine-grained control:
 
 More explanations are in each variable’s respective doc string.
 
-The mode is defined by ~define-globalized-minor-mode~, giving you access to
-~auto-capitalize-global-modes~, which is a list of modes in which to enable (or disable if
-preceded with a ~not~) the minor mode. By default, this is configured to enable
-~auto-capitalize-mode~ in ~text-mode~ and ~prog-mode~, and to exclude a number of modes where
-=auto-capitalize.el= is known not to work: ~html-mode~, ~tex-mode~, etc.
+~auto-capitalize-global-modes~ is a list of modes in which the command
+~auto-capitalize-global-mode~ will enable (or disable if preceded with a ~not~) the minor
+mode. By default, this is configured to enable ~auto-capitalize-mode~ in ~text-mode~ and
+~prog-mode~, and to exclude a number of modes where =auto-capitalize.el= is known not to work:
+~html-mode~, ~tex-mode~, etc.
 
 ~auto-capitalize-fixed-case-words~ is a list of words whose case will always be exactly how
 it appears in the list. For example, the English pronoun "I" - the only default entry -
