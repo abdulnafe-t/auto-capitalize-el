@@ -5,10 +5,12 @@ on:
     paths-ignore:
       - '*.org'
       - '*.md'
+      - '.dir-locals.el'
   pull_request:
     paths-ignore:
       - '*.org'
       - '*.md'
+      - '.dir-locals.el'
   workflow_dispatch:
 
 permissions:
