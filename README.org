@@ -28,17 +28,18 @@ The easiest way to get ~auto-capitalize.el~ is from MELPA:
 1) If you don’t have MELPA set up already, [[https://melpa.org/#/getting-started][it’s easy to do so]].
 2) Once your ~package.el~ can talk to MELPA, you can simply say
 
-   ~M-x package-install RET auto-capitalize RET~.
+   ~M-x package-install RET auto-capitalize RET~
 
 *** Get it from this repo
 **** With ~package-vc~
-If you’re on emacs 29.1+, you can install ~auto-capitalize~ directly from this repo with emacs’s builtin ~package-vc~:
+If you’re on emacs 29.1+, you can install ~auto-capitalize~ directly from this repo with
+emacs’s builtin ~package-vc~:
 
-   ~M-: (package-vc-install "https://github.com/abdulnafe-t/auto-capitalize.el") RET~.
+~M-: (package-vc-install "https://github.com/abdulnafe-t/auto-capitalize.el") RET~
 
 This will clone the repo directly into your elpa directory and works much the same as
 installing from MELPA. The main difference is that VC packages are not upgraded along with
-the rest: you need to call ~package-vc-upgrade~ or ~package-vc-upgrade-all~ for that.
+the rest: you will need to call ~package-vc-upgrade~ or ~package-vc-upgrade-all~ for that.
 
 **** Manually
 Of course, there’s always the good old way of cloning the repo or downloading [[https://github.com/abdulnafe-t/auto-capitalize.el/releases][the latest
