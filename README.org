@@ -30,13 +30,29 @@ The easiest way to get ~auto-capitalize.el~ is from MELPA:
 
    ~M-x package-install RET auto-capitalize RET~.
 
-*** Get it manually
-Put ~auto-capitalize.el~ (and possibly its plugins) somewhere in your load-path, then put
-this in your =.emacs=:
+*** Get it from this repo
+**** With ~package-vc~
+If you’re on emacs 29.1+, you can install ~auto-capitalize~ directly from this repo with emacs’s builtin ~package-vc~:
+
+   ~M-: (package-vc-install "https://github.com/abdulnafe-t/auto-capitalize.el") RET~.
+
+This will clone the repo directly into your elpa directory and works much the same as
+installing from MELPA. The main difference is that VC packages are not upgraded along with
+the rest: you need to call ~package-vc-upgrade~ or ~package-vc-upgrade-all~ for that.
+
+**** Manually
+Of course, there’s always the good old way of cloning the repo or copying the files
+manually and putting them somewhere your emacs can find them. For example:
+
+#+begin_src sh
+git clone https://github.com/abdulnafe-t/auto-capitalize.el ~/.config/emacs/elpa/auto-capitalize
+#+end_src
+
+Then put this somewhere in your =init.el=:
 
 #+begin_src elisp
-  (require 'auto-capitalize)
-  (auto-capitalize-global-mode)
+(add-to-list 'load-path "~/.config/emacs/elpa/auto-capitalize/")
+(require 'auto-capitalize)
 #+end_src
 
 ** Enabling auto-capitalize-mode
