@@ -13,7 +13,7 @@
 ;; Package-Requires: ((emacs "28.1") (compat "31.0"))
 
 ;; Created: 20 May 1998
-;; Package-Version: 3.0
+;; Package-Version: 3.1.1
 ;; Keywords: text, wp, convenience
 ;; URL: https://github.com/abdulnafe-t/auto-capitalize.el
 
@@ -102,7 +102,7 @@
 (require 'regexp-opt) ; regexp-opt
 (require 'compat)     ; when-let*, set-local
 
-(defconst auto-capitalize-version "3.0"
+(defconst auto-capitalize-version "3.1.1"
   "The version of auto-capitalize.el.")
 
 (defgroup auto-capitalize nil
