@@ -882,20 +882,17 @@ comments."
 ;;;; Misc.
 
 (ert-deftest auto-capitalize-global-modes-test ()
-  "Don't activate `auto-capitalize-mode' in any major mode excluded in `auto-capitalize-global-modes'."
+  "Don't activate `auto-capitalize-mode' in any major mode excluded in
+`auto-capitalize-global-modes'."
   (auto-capitalize-global-mode)
   (ert-with-test-buffer
       (:name "*Auto-capitalize-test-buffer*")
     (dolist (mode (cdar auto-capitalize-global-modes))
       (when (fboundp mode)
-        ;; `php-ts-mode' requires the `php' grammar, which may not be
-        ;; installed; skip just this mode, not the whole test.
-        (unless (and (eq mode 'php-ts-mode)
-                     (not (auto-capitalize-tests--ts-grammar-available-p 'php)))
-          (funcall mode)
-          (should-not auto-capitalize-mode))))))
+        (funcall mode)
+        (should-not auto-capitalize-mode)))))
 
-(ert-deftest auto-capitalize-temp-buffers-test ()
+(ert-deftest auto-capitalize-temp-buffers ()
   "Don't activate `auto-capitalize-mode' in any temp buffer."
   (auto-capitalize-global-mode)
   (with-temp-buffer
@@ -916,7 +913,7 @@ comments."
     (ert-simulate-command '(self-insert-command 1 ?a))
     (ert-simulate-command '(self-insert-command 1 ?\s))
     (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                                                   ";; A "))))
+                   ";; A "))))
 
 (provide 'auto-capitalize-tests)
 ;;; auto-capitalize-tests.el ends here
