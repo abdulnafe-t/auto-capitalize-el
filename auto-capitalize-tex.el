@@ -104,9 +104,9 @@ This function is added to `auto-capitalize-trigger-functions' when
                             (not (TeX-escaped-p (1- (point)))))
                    (TeX-find-macro-start)))))
     (save-excursion
-      (goto-char (1- macro-start))
+      (goto-char macro-start)
       (auto-capitalize-default-trigger-function
-       (point) macro-start))))
+       (point) (1+ (point))))))
 
 ;;;###autoload
 (define-minor-mode auto-capitalize-tex-mode
