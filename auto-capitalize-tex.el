@@ -103,10 +103,10 @@ This function is added to `auto-capitalize-trigger-functions' when
                  (when (and (eq (char-before) ?{)
                             (not (TeX-escaped-p (1- (point)))))
                    (TeX-find-macro-start)))))
-
-    (goto-char (1- macro-start))
-    (auto-capitalize-default-trigger-function
-     (1- macro-start) macro-start)))
+    (save-excursion
+      (goto-char (1- macro-start))
+      (auto-capitalize-default-trigger-function
+       (point) macro-start))))
 
 ;;;###autoload
 (define-minor-mode auto-capitalize-tex-mode
