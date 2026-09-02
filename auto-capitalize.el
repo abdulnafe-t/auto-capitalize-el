@@ -246,11 +246,12 @@ Alternatively, if the word is \"I.e.\", then it is downcased by calling
        ((and auto-capitalize--fixed-case-regexp
              (let ((case-fold-search nil))
                (with-syntax-table auto-capitalize--syntax-table
-                 (goto-char word-start)
-                 (and (looking-at auto-capitalize--fixed-case-regexp)
-                      (let ((after (match-end 0)))
-                        (or (>= after (point-max))
-                            (not (eq (char-syntax (char-after after)) ?w))))))))
+                 (save-excursion
+                   (goto-char word-start)
+                   (and (looking-at auto-capitalize--fixed-case-regexp)
+                        (let ((after (match-end 0)))
+                          (or (>= after (point-max))
+                              (not (eq (char-syntax (char-after after)) ?w)))))))))
 
         (auto-capitalize--handle-fixed-case (match-beginning 0) (match-end 0)))
 
@@ -262,20 +263,19 @@ Alternatively, if the word is \"I.e.\", then it is downcased by calling
        ;;
        ;; The price to pay is that even if the user types capital I, with the
        ;; intent of typing "I.e.", it still gets downcased.
-       ((progn
+       ((save-excursion
           (goto-char word-start)
           (skip-chars-backward "[[:alpha:]].")
           (let ((case-fold-search nil))
             (looking-at "I\\.e\\.")))
 
-        (auto-capitalize--downcase-ie (point) (+ (point) 4)))
+        (auto-capitalize--downcase-ie (match-beginning 0) (match-end 0)))
 
        ((auto-capitalize--check-triggers
          text-start word-start)
         ;; capitalize!
         (undo-boundary)
-        (goto-char word-start)
-        (capitalize-word 1))))))
+        (capitalize-word -1))))))
 
 (defun auto-capitalize--set-fixed-case (sym val &optional buffer-local)
   "Setter for `auto-capitalize-fixed-case-words'.
@@ -725,7 +725,7 @@ word before point (or the yanked text) should be capitalized."
                                                   (match-end 0)
                                                   0))))))
 
-           ;; Self-inserting a non-word character.
+           ;; Self-inserting a non-word character?
            ((and (= length 0)
                  (> end beg)
                  (with-syntax-table auto-capitalize--syntax-table
