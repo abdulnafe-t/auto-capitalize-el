@@ -885,7 +885,7 @@ comments."
 
 ;;;; Undo
 
-(ert-deftest auto-capitalize-undo-dont-move-point ()
+(ert-deftest auto-capitalize-undo-cap-dont-move-point ()
   "Make sure undoing capitalization does not move point."
   (skip-unless (fboundp #'ert-play-keys))
   (auto-capitalize-tests--setup
@@ -896,6 +896,30 @@ comments."
    (ert-play-keys "C-x u")
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
                   ";; a "))
+   (should (equal (point) (point-max)))))
+
+(ert-deftest auto-capitalize-undo-ie-dont-move-point ()
+  "Make sure undoing capitalization does not move point."
+  (skip-unless (fboundp #'ert-play-keys))
+  (auto-capitalize-tests--setup
+   emacs-lisp-mode
+   (ert-play-keys "M-;")
+   (ert-play-keys "i.e.")
+   (ert-play-keys "C-x u")
+   (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                  ";; I.e."))
+   (should (equal (point) (point-max)))))
+
+(ert-deftest auto-capitalize-undo-fixed-case-dont-move-point ()
+  "Make sure undoing capitalization does not move point."
+  (skip-unless (fboundp #'ert-play-keys))
+  (auto-capitalize-tests--setup
+   emacs-lisp-mode
+   (ert-play-keys "M-;")
+   (ert-play-keys "you SPC and SPC i SPC")
+   (ert-play-keys "C-x u")
+   (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                  ";; You and i "))
    (should (equal (point) (point-max)))))
 
 ;;;; Misc.
