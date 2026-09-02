@@ -49,11 +49,8 @@
 (define-minor-mode auto-capitalize-sgml-mode
   "Toggle SGML-specific capitalization support in this buffer.
 
-When enabled, this mode adds SGML-specific blocking and trigger functions
-to `auto-capitalize-blocking-functions' and
-`auto-capitalize-trigger-functions' buffer-locally, namely
-`auto-capitalize-sgml-blocking-function' and
-`auto-capitalize-sgml-trigger-function'.
+When enabled, this mode adds `auto-capitalize-sgml-blocking-function' to
+`auto-capitalize-blocking-functions' and buffer-locally.
 
 If `auto-capitalize-mode' is not yet enabled in this buffer, it
 will be enabled automatically."
