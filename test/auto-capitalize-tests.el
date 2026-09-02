@@ -35,7 +35,8 @@
 (defmacro auto-capitalize-tests--setup (mode &rest body)
   "Set up a buffer for auto-capitalize-tests."
   `(ert-with-test-buffer
-       (:name "*auto-capitalize-tests*")
+       (:name "*auto-capitalize-tests*"
+              :selected t)
      (,mode)
      (auto-capitalize-mode 1)
      (electric-quote-local-mode -1)
@@ -878,6 +879,20 @@ comments."
    (ert-simulate-command '(self-insert-command 1 ?\s))
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
                   "<script>\nlet x; // A \n</script>"))))
+
+;;;; Undo
+
+(ert-deftest auto-capitalize-undo-dont-move-point ()
+  "Make sure undoing capitalization does not move point."
+  (auto-capitalize-tests--setup
+   emacs-lisp-mode
+   (ert-play-keys "M-;")
+   (ert-play-keys "a")
+   (ert-play-keys "SPC")
+   (ert-play-keys "C-x u")
+   (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                  ";; a "))
+   (should (equal (point) (point-max)))))
 
 ;;;; Misc.
 
