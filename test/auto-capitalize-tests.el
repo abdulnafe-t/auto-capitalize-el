@@ -32,28 +32,30 @@
 (when (featurep 'auctex)
   (require 'auto-capitalize-tex))
 
+(defun auto-capitalize-tests--play-keys (keys)
+  "Play KEYS as if typed by the user.
+Inlines `ert-play-keys' (Emacs 31.1+) via `execute-kbd-macro'."
+  (execute-kbd-macro (kbd keys)))
+
 (defmacro auto-capitalize-tests--setup (mode &rest body)
   "Set up a buffer for auto-capitalize-tests."
-  (let ((buffer-args
-         (if (version<= "31.1" emacs-version)
-             `(:name "*auto-capitalize-tests*" :selected t)
-           `(:name "*auto-capitalize-tests*"))))
-    `(ert-with-test-buffer
-         ,buffer-args
-       (,mode)
-       (auto-capitalize-mode 1)
-       (electric-quote-local-mode -1)
-       (electric-pair-local-mode -1)
-       (when (and (derived-mode-p 'TeX-mode)
-                  (fboundp 'auto-capitalize-tex-mode))
-         (auto-capitalize-tex-mode 1))
-       (when (and (derived-mode-p 'org-mode)
-                  (fboundp 'auto-capitalize-org-mode))
-         (auto-capitalize-org-mode 1))
-       (when (and (derived-mode-p 'sgml-mode)
-                  (fboundp 'auto-capitalize-sgml-mode))
-         (auto-capitalize-sgml-mode 1))
-       (progn ,@body))))
+  (declare (indent 1))
+  `(ert-with-test-buffer
+       (:name "*auto-capitalize-tests*")
+     (,mode)
+     (auto-capitalize-mode 1)
+     (electric-quote-local-mode -1)
+     (electric-pair-local-mode -1)
+     (when (derived-mode-p 'TeX-mode)
+       (auto-capitalize-tex-mode 1))
+     (when (derived-mode-p 'org-mode)
+       (auto-capitalize-org-mode 1))
+     (when (derived-mode-p 'sgml-mode)
+       (auto-capitalize-sgml-mode 1))
+     (save-window-excursion
+       (with-current-buffer (current-buffer)
+         (with-selected-window (display-buffer (current-buffer))
+           (progn ,@body))))))
 
 
 ;;;; Tests for `text-mode'
@@ -887,37 +889,34 @@ comments."
 
 (ert-deftest auto-capitalize-undo-cap-dont-move-point ()
   "Make sure undoing capitalization does not move point."
-  (skip-unless (fboundp #'ert-play-keys))
   (auto-capitalize-tests--setup
    emacs-lisp-mode
-   (ert-play-keys "M-;")
-   (ert-play-keys "a")
-   (ert-play-keys "SPC")
-   (ert-play-keys "C-x u")
+   (auto-capitalize-tests--play-keys "M-;")
+   (auto-capitalize-tests--play-keys "a")
+   (auto-capitalize-tests--play-keys "SPC")
+   (auto-capitalize-tests--play-keys "C-x u")
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
                   ";; a "))
    (should (equal (point) (point-max)))))
 
 (ert-deftest auto-capitalize-undo-ie-dont-move-point ()
   "Make sure undoing capitalization does not move point."
-  (skip-unless (fboundp #'ert-play-keys))
   (auto-capitalize-tests--setup
    emacs-lisp-mode
-   (ert-play-keys "M-;")
-   (ert-play-keys "i.e.")
-   (ert-play-keys "C-x u")
+   (auto-capitalize-tests--play-keys "M-;")
+   (auto-capitalize-tests--play-keys "i.e.")
+   (auto-capitalize-tests--play-keys "C-x u")
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
                   ";; I.e."))
    (should (equal (point) (point-max)))))
 
 (ert-deftest auto-capitalize-undo-fixed-case-dont-move-point ()
   "Make sure undoing capitalization does not move point."
-  (skip-unless (fboundp #'ert-play-keys))
   (auto-capitalize-tests--setup
    emacs-lisp-mode
-   (ert-play-keys "M-;")
-   (ert-play-keys "you SPC and SPC i SPC")
-   (ert-play-keys "C-x u")
+   (auto-capitalize-tests--play-keys "M-;")
+   (auto-capitalize-tests--play-keys "you SPC and SPC i SPC")
+   (auto-capitalize-tests--play-keys "C-x u")
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
                   ";; You and i "))
    (should (equal (point) (point-max)))))
