@@ -359,6 +359,23 @@ chars."
      (should (equal (buffer-substring-no-properties (point-min) (point-max))
                     (concat "\\" macro "{A }" ))))))
 
+(ert-deftest auto-capitalize-TeX-whitelist-macros-in-sentence ()
+  "Capitalize the first word in a `TeX-mode' whitelisted macro at the start
+of a sentence."
+  (skip-unless (featurep 'auctex))
+  (auto-capitalize-tests--setup
+   TeX-mode
+   (setq-local sentence-end-double-space nil)
+   (dolist (macro auto-capitalize-tex-macro-whitelist)
+     (erase-buffer)
+     (insert "Some filler text. ")
+     (insert (concat "\\" macro "{}"))
+     (backward-char)
+     (ert-simulate-command '(self-insert-command 1 ?a))
+     (ert-simulate-command '(self-insert-command 1 ?\s))
+     (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                    (concat "Some filler text. \\" macro "{A }" ))))))
+
 (ert-deftest auto-capitalize-TeX-ignore-whitelist-macros ()
   "Don’t follow `TeX-mode' whitelisted macro if the context doesn't make sense."
   (skip-unless (featurep 'auctex))
