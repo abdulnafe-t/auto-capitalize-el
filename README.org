@@ -253,7 +253,7 @@ The Org, TeX, and SGML plugins can serve as examples of what that might look lik
   teach ~auto-capitalize~ different markup syntaxes.
 
 - The abbreviation "i.e." is always downcased, even if it appears at the start of a
-  Sentence, if the user option ~auto-capitalize-downcase-ie~ is non-nil (the default).
+  sentence, if the user option ~auto-capitalize-downcase-ie~ is non-nil (the default).
 
 - On older versions of org (< 9.8), native syntax properties of src-blocks are not
   applied, which means ~auto-capitalize~ can’t capitalize comments in such blocks.
