@@ -58,7 +58,6 @@ Only macros taking plain text as an argument should be included. Macros
 matching `outline-regexp' (like \\section) need not be listed, as they
 are already handled by the `outline-regexp' check in
 `auto-capitalize-default-trigger-function'."
-  :group 'auto-capitalize-tex
   :type '(repeat (string :tag "Macro name")))
 
 (defun auto-capitalize-tex-blocking-function (_text-start word-start)
@@ -123,7 +122,6 @@ Note that this mode requires `AUCTeX'.
 If `auto-capitalize-mode' is not yet enabled in this buffer, it
 will be enabled automatically."
   :lighter nil
-  :group 'auto-capitalize-tex
   (cond
    ((not auto-capitalize-tex-mode)
     (remove-hook 'auto-capitalize-blocking-functions

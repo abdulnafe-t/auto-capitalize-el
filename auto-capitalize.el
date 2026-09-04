@@ -333,12 +333,10 @@ If BUFFER-LOCAL is non-nil, only sets the buffer-local value."
 
 (defcustom auto-capitalize-ask nil
   "If non-nil, always ask before capitalizing."
-  :group 'auto-capitalize
   :type 'boolean)
 
 (defcustom auto-capitalize-yank nil
   "If non-nil, auto-capitalization applies to yanked text."
-  :group 'auto-capitalize
   :type 'boolean)
 
 (defcustom auto-capitalize-strings t
@@ -346,7 +344,6 @@ If BUFFER-LOCAL is non-nil, only sets the buffer-local value."
 
 This variable is checked by `auto-capitalize-default-trigger-function'
 and `auto-capitalize-default-blocking-function'."
-  :group 'auto-capitalize
   :type 'boolean)
 
 (defcustom auto-capitalize-start-of-inline-strings nil
@@ -365,7 +362,6 @@ delimiter is the first non-whitespace on their line are capitalized
 \(like docstrings).
 
 This variable is checked by `auto-capitalize-default-trigger-function'."
-  :group 'auto-capitalize
   :type 'boolean)
 
 (defcustom auto-capitalize-start-of-inline-comments t
@@ -380,7 +376,6 @@ With this option set to t, the word \"some\" would be capitalized to
 \"Some\".
 
 This variable is checked by `auto-capitalize-default-trigger-function'."
-  :group 'auto-capitalize
   :type 'boolean)
 
 (defcustom auto-capitalize-comments t
@@ -388,7 +383,6 @@ This variable is checked by `auto-capitalize-default-trigger-function'."
 
 This variable is checked by `auto-capitalize-default-trigger-function'
 and `auto-capitalize-default-blocking-function'."
-  :group 'auto-capitalize
   :type 'boolean)
 
 (defcustom auto-capitalize-fixed-case-words '("I")
@@ -407,7 +401,6 @@ This list should be set with `setopt', the `customize' interface, the
 `auto-capitalize-remove-fixed-case-words'. Changing it with `setq' or
 `add-to-list' will not work correctly."
 
-  :group 'auto-capitalize
   :type '(repeat (string :tag "Word list"))
   :set #'auto-capitalize--set-fixed-case)
 
@@ -425,7 +418,6 @@ This list should be set with `setopt', the :custom keyword in
 `auto-capitalize-add-abbrevs' or `auto-capitalize-remove-abbrevs'.
 Changing it with `setq' or `add-to-list' will not work correctly."
 
-  :group 'auto-capitalize
   :type '(repeat (string :tag "Non-sentence ending word."))
   :set #'auto-capitalize--set-abbrevs)
 
@@ -437,7 +429,6 @@ combination of `auto-capitalize-fixed-case-words' containing \"I\", and
 `auto-capitalize-abbrevs' containing \"i.e.\", leading to the latter
 getting capitalized when it shouldn't."
 
-  :group 'auto-capitalize
   :type 'boolean)
 
 (defcustom auto-capitalize-blocking-functions
@@ -453,7 +444,6 @@ functions pass are the trigger functions consulted.
 
 Plugins like `auto-capitalize-org' and `auto-capitalize-tex' can add
 their own blocking functions to this hook buffer-locally."
-  :group 'auto-capitalize
   :type 'hook
   :options (list #'auto-capitalize-default-blocking-function))
 
@@ -472,7 +462,6 @@ functions pass are the trigger functions consulted.
 
 Plugins like `auto-capitalize-org' and `auto-capitalize-tex' can add
 their own trigger functions to this hook buffer-locally."
-  :group 'auto-capitalize
   :type 'hook
   :options (list #'auto-capitalize-default-trigger-function))
 

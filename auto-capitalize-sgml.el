@@ -55,7 +55,6 @@ When enabled, this mode adds `auto-capitalize-sgml-blocking-function' to
 If `auto-capitalize-mode' is not yet enabled in this buffer, it
 will be enabled automatically."
   :lighter nil
-  :group 'auto-capitalize-sgml
   (cond
    ((not auto-capitalize-sgml-mode)
     (remove-hook 'auto-capitalize-blocking-functions

@@ -39,8 +39,7 @@
 
 (defcustom auto-capitalize-org-block-org-blocks t
   "Non-nil means to block capitalization of org blocks."
-  :type 'boolean
-  :group 'auto-capitalize-org)
+  :type 'boolean)
 
 (defvar auto-capitalize-org--lighter "/Org"
   "Appended to `auto-capitalize--lighter' by `auto-capitalize-org-mode'.")
@@ -148,7 +147,6 @@ to `auto-capitalize-blocking-functions' and
 If `auto-capitalize-mode' is not yet enabled in this buffer, it
 will be enabled automatically."
   :lighter nil
-  :group 'auto-capitalize-org
   (cond
    ((not auto-capitalize-org-mode)
     (remove-hook 'auto-capitalize-blocking-functions
