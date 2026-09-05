@@ -101,8 +101,7 @@
 (require 'seq)        ; seq-difference
 (require 'regexp-opt) ; regexp-opt
 (require 'compat)     ; when-let*, set-local
-(require 'ffap)       ; ffap-file-at-point
-(require 'thingatpt ) ; thing-at-point-uri-schemes
+(require 'thingatpt ) ; thing-at-point-uri-schemes, thing-at-point-file-at-point
 
 (defconst auto-capitalize-version "3.1.2"
   "The version of auto-capitalize.el.")
@@ -490,7 +489,7 @@ return non-nil to block capitalization if any of them hold:
 
 2) it is a minibuffer
 
-3) if `ffap-file-at-point' returns non-nil
+3) if `thing-at-point-file-at-point' returns non-nil
 
 4) if the word at WORD-START matches `auto-capitalize--uri-scheme'
 
@@ -513,7 +512,7 @@ corresponding user option (`auto-capitalize-comments' or
         (or
 
          ;; Don't capitalize filepaths
-         (ffap-file-at-point)
+         (thing-at-point-file-at-point)
 
          ;; Don't capitalize URI schemes
          (looking-at auto-capitalize--uri-scheme)
