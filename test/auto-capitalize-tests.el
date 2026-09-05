@@ -957,5 +957,17 @@ comments."
     (should (equal (buffer-substring-no-properties (point-min) (point-max))
                    ";; A "))))
 
+(ert-deftest auto-capitalize-file-paths ()
+  "Don't capitalize filepaths."
+  (auto-capitalize-tests--setup
+   text-mode
+   (insert "\"\"")
+   (backward-char)
+   (insert "/")
+   (insert "home")
+   (ert-simulate-command '(self-insert-command 1 ?/))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                  "\"/home/\""))))
+
 (provide 'auto-capitalize-tests)
 ;;; auto-capitalize-tests.el ends here

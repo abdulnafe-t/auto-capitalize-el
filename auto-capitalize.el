@@ -101,6 +101,7 @@
 (require 'seq)        ; seq-difference
 (require 'regexp-opt) ; regexp-opt
 (require 'compat)     ; when-let*, set-local
+(require 'ffap)       ; ffap-file-at-point
 
 (defconst auto-capitalize-version "3.1.1"
   "The version of auto-capitalize.el.")
@@ -477,20 +478,22 @@ text and the start of the current word, respectively.
 Specifically, check the current buffer for the following conditions, and
 return non-nil to block capitalization if any of them hold:
 
-1) It is read-only
+1) it is read-only
 
 2) it is a minibuffer
 
-3) if in `text-mode', capitalizing text other than comments or strings
+3) if `ffap-file-at-point' returns non-nil
+
+4) if in `text-mode', capitalizing text other than comments or strings
 is not blocked, while capitalization in comments/strings is similarly
 gated by the corresponding user options. If outside of `text-mode', the
 current text is in neither a comment nor a string, or it is but the
 corresponding user option (`auto-capitalize-comments' or
 `auto-capitalize-strings') is nil.
 
-4) if the word preceding WORD-START is in `auto-capitalize-abbrevs'
+5) if the word preceding WORD-START is in `auto-capitalize-abbrevs'
 
-5) the last typed character has word syntax (see the docstring of
+6) the last typed character has word syntax (see the docstring of
 `modify-syntax-entry', as well as the Info node `(elisp)Syntax Tables'."
 
   (or buffer-read-only
@@ -498,6 +501,10 @@ corresponding user option (`auto-capitalize-comments' or
       (save-excursion
         (goto-char word-start)
         (or
+
+         ;; Don't capitalize filepaths
+         (ffap-file-at-point)
+
          ;; If in text-mode, don't block if outside of comments or strings, and
          ;; only block inside comments or strings if the corresponding option is
          ;; nil.
