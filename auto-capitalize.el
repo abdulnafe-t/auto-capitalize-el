@@ -102,6 +102,7 @@
 (require 'regexp-opt) ; regexp-opt
 (require 'compat)     ; when-let*, set-local
 (require 'ffap)       ; ffap-file-at-point
+(require 'thingatpt ) ; thing-at-point-uri-schemes
 
 (defconst auto-capitalize-version "3.1.1"
   "The version of auto-capitalize.el.")
@@ -136,6 +137,13 @@ the regexp on every keystroke, and by
     (modify-syntax-entry ?’ "." st)
     st)
   "Syntax table used when deciding whether to capitalize a word.")
+
+(defvar auto-capitalize--uri-scheme (regexp-opt (mapcar (lambda(str)
+                                                          (string-trim-right str "//"))
+                                                        thing-at-point-uri-schemes))
+  "Regexp matching URI schemes, without any trailing slashes.
+
+This is built from `thing-at-point-uri-schemes'.")
 
 
 ;;; Forward declarations to satisfy the compiler
@@ -484,16 +492,18 @@ return non-nil to block capitalization if any of them hold:
 
 3) if `ffap-file-at-point' returns non-nil
 
-4) if in `text-mode', capitalizing text other than comments or strings
+4) if the word at WORD-START matches `auto-capitalize--uri-scheme'
+
+5) if in `text-mode', capitalizing text other than comments or strings
 is not blocked, while capitalization in comments/strings is similarly
 gated by the corresponding user options. If outside of `text-mode', the
 current text is in neither a comment nor a string, or it is but the
 corresponding user option (`auto-capitalize-comments' or
 `auto-capitalize-strings') is nil.
 
-5) if the word preceding WORD-START is in `auto-capitalize-abbrevs'
+6) if the word preceding WORD-START is in `auto-capitalize-abbrevs'
 
-6) the last typed character has word syntax (see the docstring of
+7) the last typed character has word syntax (see the docstring of
 `modify-syntax-entry', as well as the Info node `(elisp)Syntax Tables'."
 
   (or buffer-read-only
@@ -504,6 +514,9 @@ corresponding user option (`auto-capitalize-comments' or
 
          ;; Don't capitalize filepaths
          (ffap-file-at-point)
+
+         ;; Don't capitalize URI schemes
+         (looking-at auto-capitalize--uri-scheme)
 
          ;; If in text-mode, don't block if outside of comments or strings, and
          ;; only block inside comments or strings if the corresponding option is

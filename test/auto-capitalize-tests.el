@@ -961,13 +961,20 @@ comments."
   "Don't capitalize filepaths."
   (auto-capitalize-tests--setup
    text-mode
-   (insert "\"\"")
-   (backward-char)
    (insert "/")
    (insert "home")
    (ert-simulate-command '(self-insert-command 1 ?/))
    (should (equal (buffer-substring-no-properties (point-min) (point-max))
-                  "\"/home/\""))))
+                  "/home/"))))
+
+(ert-deftest auto-capitalize-uri ()
+  "Don't capitalize URI schemes."
+  (auto-capitalize-tests--setup
+   text-mode
+   (insert "https")
+   (ert-simulate-command '(self-insert-command 1 ?:))
+   (should (equal (buffer-substring-no-properties (point-min) (point-max))
+                  "https:"))))
 
 (provide 'auto-capitalize-tests)
 ;;; auto-capitalize-tests.el ends here
