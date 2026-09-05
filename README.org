@@ -95,7 +95,9 @@ This will give you markup-aware capitalization in those modes, such as capitaliz
 inside of any TeX macro listed in ~auto-capitalize-tex-macro-whitelist~, not capitalizing
 HTML tags, preventing capitalization in TeX math environments, etc.
 
-And that’s pretty much it. Start typing to try it out!
+And that’s pretty much it. Start typing to try it out! And if it ever capitalizes (or
+downcases) a word in a way you don’t like, you can simply undo (~C-x u~ by default) to
+revert that capitalization.
 
 * Customization
 
@@ -119,9 +121,6 @@ only enable =auto-capitalize.el= in text-mode buffers, but not prog-mode, you co
 Note, however, that the global mode will not enable ~auto-capitalize-mode~ in major modes
 where it shouldn’t: see the user option ~auto-capitalize-global-modes~. Enabling the minor
 mode either manually or via a general hook will not give you that protection.
-
-If the package ever capitalizes (or downcases) a word in a way you don’t like, you can
-simply undo (~C-x u~ by default) to revert that capitalization.
 
 ** User options
 
